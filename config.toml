@@ -1,5 +1,0 @@
-[server]
-port = 8080
-
-[db]
-credentials = "host=localhost port=5432 user=user dbname=db password=postgres"

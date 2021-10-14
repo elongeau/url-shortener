@@ -55,3 +55,4 @@ TAGS
 .DS_Store
 
 requests/*
+secrets

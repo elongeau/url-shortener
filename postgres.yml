@@ -8,7 +8,7 @@ services:
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: user
-      POSTGRES_DB: db
+      POSTGRES_DB: url-shortener
     ports:
       - 5432:5432
 
