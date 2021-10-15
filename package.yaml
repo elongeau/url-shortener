@@ -18,6 +18,7 @@ dependencies:
   - resource-pool
   - bytestring
   - postgresql-simple-migration
+  - mr-env
 
 library:
   source-dirs: src
@@ -43,6 +44,7 @@ tests:
       - -with-rtsopts=-N
     dependencies:
       - url-shortener
+      - hspec
       - hedgehog
 
 ghc-options:

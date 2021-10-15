@@ -56,6 +56,7 @@ library
     , bytestring
     , deriving-aeson
     , either
+    , mr-env
     , mtl
     , postgresql-simple
     , postgresql-simple-migration
@@ -103,6 +104,7 @@ executable url-shortener
     , bytestring
     , deriving-aeson
     , either
+    , mr-env
     , mtl
     , postgresql-simple
     , postgresql-simple-migration
@@ -121,7 +123,7 @@ test-suite spec
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      UserSpec
+      ConfigSpec
       Paths_url_shortener
   hs-source-dirs:
       test
@@ -154,6 +156,8 @@ test-suite spec
     , deriving-aeson
     , either
     , hedgehog
+    , hspec
+    , mr-env
     , mtl
     , postgresql-simple
     , postgresql-simple-migration

@@ -1,17 +1,20 @@
-module Config ( Config (..), Server (..), DB (..), Port (..),loadConfig) where
+module Config (Config (..), loadConfig) where
 
 import Data.ByteString (ByteString)
+import Data.ByteString.Char8 (pack)
+import System.Environment.MrEnv (envAsInt, envAsString)
 
-data Config = Config {cServer :: Server, cDB :: DB} deriving stock (Show)
+data Config = Config
+  { cfgPort :: Int,
+    cfgDbCredentials :: ByteString
+  }
+  deriving stock (Show, Eq)
 
-newtype Server = Server {cPort :: Port} deriving stock (Show)
-
-newtype DB = DB {dbCredentials :: ByteString} deriving stock (Show)
-
-newtype Port = Port Int deriving stock (Show)
-
-loadConfig :: IO Config
-loadConfig = pure $ Config {
-  cServer = Server $ Port 8080,
-  cDB = DB ""
-}
+loadConfig :: IO (Maybe Config)
+loadConfig = do
+  dbCred <- envAsString "db_credentials" ""
+  port <- envAsInt "port" 8080
+  pure $
+    if null dbCred
+      then Nothing
+      else Just $ Config port (pack dbCred)

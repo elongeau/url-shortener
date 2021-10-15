@@ -30,14 +30,20 @@ runServer env = serve (Proxy @RealworldAPI) $ server env
 
 mkAppEnv :: C.Config -> IO Env
 mkAppEnv C.Config{..} = do
-  let (C.Port envPort) = C.cPort cServer
-  envDbPool <- mkPool $ C.dbCredentials cDB
+  let envPort = cfgPort
+  envDbPool <- mkPool cfgDbCredentials
   pure Env{..}
 
 runApp :: Env -> IO ()
 runApp env@Env{..} = run envPort $ runServer env
 
 main :: IO ()
-main = putStrLn "Starting Realworld app" >> C.loadConfig >>= mkAppEnv >>= \env@Env{..} -> do
-    -- _ <- runDbMigration envDbPool 
-    runApp env
+main = do
+  maybeConf <- C.loadConfig
+  case maybeConf of
+    Nothing -> putStrLn "Can't connect to DB"
+    Just conf -> do
+      env@Env{..} <- mkAppEnv conf
+      runDbMigration envDbPool 
+      putStrLn "Starting Realworld app"
+      runApp env
