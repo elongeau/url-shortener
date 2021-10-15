@@ -8,15 +8,13 @@ import qualified Database.PostgreSQL.Simple as Sql
 
 type DBPool = Pool.Pool Sql.Connection
 
-data Env  = Env
-  { envPort :: !Int,
-    envDbPool :: !DBPool
+newtype Env  = Env
+  { envPort :: Int
   }
 
 class Has field env where
   obtain :: env -> field
 
-instance Has DBPool Env where obtain = envDbPool
 type WithDB env m = (MonadReader env m, MonadIO m, Has DBPool env)
 
 grab :: forall field env m. (MonadReader env m, Has field env) => m field
