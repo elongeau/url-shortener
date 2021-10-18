@@ -44,6 +44,11 @@ tests:
       - url-shortener
       - hspec
       - hedgehog
+      - http-types
+      - wai-extra
+      - hspec-wai
+      - servant-client
+      - http-client
 
 ghc-options:
   - -Weverything

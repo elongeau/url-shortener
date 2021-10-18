@@ -9,6 +9,5 @@ data Url = Url
     urlId :: T.Text
   }
   deriving stock (Show, Eq, Generic)
-  deriving anyclass (FromRow, ToRow)
 
 instance ToJSON Url

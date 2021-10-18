@@ -1,4 +1,4 @@
-module UrlShortener (main) where
+module UrlShortener (main, runServer,runApp,API) where
 
 import App.Env ( Env(..) )
 import App.Monad ( App(unApp) )
@@ -8,10 +8,8 @@ import Network.Wai.Handler.Warp (run)
 import Servant (Application, Handler, Proxy (Proxy), hoistServer, ServerT)
 import Servant.Server (Server, serve)
 import qualified Config as C
-import DB.Pool ( mkPool )
-import DB.Migrations (runDbMigration)
 
-type RealworldAPI = U.API
+type API = U.API
 
 runAsIO :: Env -> App a -> IO a
 runAsIO env app = runReaderT (unApp app) env
@@ -19,14 +17,14 @@ runAsIO env app = runReaderT (unApp app) env
 runAsHandler :: forall a. Env -> App a -> Handler a
 runAsHandler env app = liftIO $ runAsIO env app
 
-appServer :: Monad m => ServerT RealworldAPI m
+appServer :: Monad m => ServerT API m
 appServer = U.server
 
-server :: Env -> Server RealworldAPI
-server env = hoistServer (Proxy @RealworldAPI) (runAsHandler env) appServer
+server :: Env -> Server API
+server env = hoistServer (Proxy @API) (runAsHandler env) appServer
 
 runServer :: Env -> Application
-runServer env = serve (Proxy @RealworldAPI) $ server env
+runServer env = serve (Proxy @API) $ server env
 
 runApp :: Env -> IO ()
 runApp env@Env{..} = run envPort $ runServer env

@@ -1,8 +1,9 @@
 module Endpoints.Model where
 
+import Data.Aeson (FromJSON, ToJSON)
 import qualified Data.Text as T
 import GHC.Generics (Generic)
-import Data.Aeson (FromJSON, ToJSON)
+
 newtype RequestUrl = RequestUrl
   { raw :: T.Text
   }
@@ -10,9 +11,13 @@ newtype RequestUrl = RequestUrl
 
 instance FromJSON RequestUrl
 
-newtype ShortenedUrl = ShortenedUrl {
-    url :: T.Text
-}
+instance ToJSON RequestUrl
+
+newtype ShortenedUrl = ShortenedUrl
+  { url :: T.Text
+  }
   deriving stock (Show, Eq, Generic)
-  
+
+instance FromJSON ShortenedUrl
+
 instance ToJSON ShortenedUrl
