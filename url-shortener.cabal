@@ -16,10 +16,6 @@ library
       App.Env
       App.Monad
       Config
-      DB
-      DB.Functions
-      DB.Migrations
-      DB.Pool
       Domain.Urls.Url
       Endpoints.Model
       Endpoints.UrlAPI
@@ -58,8 +54,6 @@ library
     , either
     , mr-env
     , mtl
-    , postgresql-simple
-    , postgresql-simple-migration
     , resource-pool
     , servant
     , servant-server
@@ -106,8 +100,6 @@ executable url-shortener
     , either
     , mr-env
     , mtl
-    , postgresql-simple
-    , postgresql-simple-migration
     , resource-pool
     , servant
     , servant-server

@@ -34,8 +34,6 @@ runApp env@Env{..} = run envPort $ runServer env
 setup :: C.Config -> IO Env 
 setup C.Config{..} = do 
   let envPort = cfgPort
-  envDbPool <- mkPool cfgDbCredentials
-  runDbMigration envDbPool
   pure Env{..}
 
 main :: IO ()

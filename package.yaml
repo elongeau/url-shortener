@@ -14,10 +14,8 @@ dependencies:
   - either
   - time
   - unliftio
-  - postgresql-simple
   - resource-pool
   - bytestring
-  - postgresql-simple-migration
   - mr-env
 
 library:

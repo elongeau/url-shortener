@@ -1,13 +1,7 @@
-{-# LANGUAGE BlockArguments #-}
-{-# LANGUAGE DeriveAnyClass #-}
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE UndecidableInstances #-}
-
 module Domain.Urls.Url where
 
 import Data.Aeson (ToJSON)
 import qualified Data.Text as T
-import Database.PostgreSQL.Simple (FromRow, ToRow)
 import GHC.Generics (Generic)
 
 data Url = Url
