@@ -151,6 +151,7 @@ test-suite spec
     , hedgehog
     , hspec
     , hspec-wai
+    , hspec-wai-json
     , http-client
     , http-types
     , mr-env
@@ -163,6 +164,7 @@ test-suite spec
     , time
     , unliftio
     , url-shortener
+    , utf8-string
     , wai
     , wai-extra
     , warp

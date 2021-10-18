@@ -47,8 +47,10 @@ tests:
       - http-types
       - wai-extra
       - hspec-wai
+      - hspec-wai-json
       - servant-client
       - http-client
+      - utf8-string
 
 ghc-options:
   - -Weverything
