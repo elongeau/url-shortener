@@ -16,7 +16,9 @@ library
       App.Env
       App.Monad
       Config
-      Domain.Urls.Url
+      Domain.Urls
+      Domain.Urls.Model
+      Domain.Urls.Service
       Endpoints.Model
       Endpoints.UrlAPI
       UrlShortener

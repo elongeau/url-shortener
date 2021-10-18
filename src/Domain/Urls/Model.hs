@@ -1,4 +1,4 @@
-module Domain.Urls.Url where
+module Domain.Urls.Model where
 
 import Data.Aeson (ToJSON)
 import qualified Data.Text as T
@@ -11,3 +11,5 @@ data Url = Url
   deriving stock (Show, Eq, Generic)
 
 instance ToJSON Url
+
+newtype LongUrl = LongUrl {lgUrl :: T.Text}
