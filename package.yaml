@@ -51,6 +51,7 @@ tests:
       - servant-client
       - http-client
       - utf8-string
+      - containers
 
 ghc-options:
   - -Weverything

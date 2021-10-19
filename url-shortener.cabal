@@ -151,6 +151,7 @@ test-suite spec
       aeson
     , base >=4.14 && <5
     , bytestring
+    , containers
     , deriving-aeson
     , either
     , hedgehog
