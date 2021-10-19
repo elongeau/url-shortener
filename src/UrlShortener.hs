@@ -1,8 +1,8 @@
 module UrlShortener (main, runServer,runApp,API) where
 
-import App.Env ( Env(..), Has )
+import App.Env ( Env(..))
 import App.Monad ( App(unApp), AppEnv )
-import Control.Monad.Reader (MonadIO (liftIO), ReaderT (runReaderT), MonadReader)
+import Control.Monad.Reader (MonadIO (liftIO), ReaderT (runReaderT))
 import qualified Endpoints.UrlAPI as U
 import Network.Wai.Handler.Warp (run)
 import Servant (Application, Handler, Proxy (Proxy), hoistServer, ServerT)
@@ -18,7 +18,7 @@ runAsIO env app = runReaderT (unApp app) env
 runAsHandler :: forall a. AppEnv -> App a -> Handler a
 runAsHandler env app = liftIO $ runAsIO env app
 
-appServer :: forall env m . (MonadReader env m, Has (Urls.Service m) env) => ServerT API m
+appServer :: forall env m . (Urls.UrlService env m) => ServerT API m
 appServer = U.server
 
 server :: AppEnv -> Server API

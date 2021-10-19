@@ -16,6 +16,7 @@ library
       App.Env
       App.Monad
       Config
+      Domain.Has
       Domain.Urls
       Domain.Urls.Model
       Domain.Urls.Service
