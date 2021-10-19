@@ -5,6 +5,7 @@ import Data.Aeson (ToJSON, encode)
 import qualified Data.ByteString as BS
 import Data.ByteString.Lazy.UTF8 (toString)
 import Data.String (IsString (fromString))
+import Domain.Repository (Repository (Repository, findById, save))
 import qualified Domain.Urls as Urls
 import Endpoints.Model (RequestUrl (RequestUrl), ShortenedUrl (ShortenedUrl))
 import Network.HTTP.Types (hContentType, methodPost)
@@ -24,8 +25,16 @@ spec = with (pure $ runServer env) $ do
   where
     shortenedUrl :: ResponseMatcher
     shortenedUrl = fromString . toString . encode . ShortenedUrl $ "nope"
+    urlRepository :: (Monad m) => Urls.UrlRepository m
+    urlRepository =
+      Repository
+        { save = pure,
+          findById = findById'
+        }
+    findById' _ = pure Nothing
     env =
       Env
         { envPort = 8080,
-          urlService = Urls.service
+          urlService = Urls.service,
+          urlRepository = urlRepository
         }

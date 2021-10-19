@@ -9,6 +9,7 @@ import Servant (Application, Handler, Proxy (Proxy), hoistServer, ServerT)
 import Servant.Server (Server, serve)
 import qualified Config as C
 import qualified Domain.Urls.Service as Urls
+import qualified Infra.Repositories as Infra
 
 type API = U.API
 
@@ -34,6 +35,7 @@ setup :: C.Config -> IO AppEnv
 setup C.Config{..} = do 
   let envPort = cfgPort
   let urlService = Urls.service
+  let urlRepository = Infra.urlRepository
   pure Env{..}
 
 main :: IO ()

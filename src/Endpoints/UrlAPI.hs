@@ -3,7 +3,6 @@
 
 module Endpoints.UrlAPI (server, API) where
 
-import Control.Monad.Reader (MonadReader)
 import qualified Domain.Urls.Service as Urls
 import Endpoints.Model (RequestUrl (RequestUrl, raw), ShortenedUrl (ShortenedUrl))
 import Servant (ReqBody, ServerT, StdMethod (POST), Verb)
@@ -11,7 +10,7 @@ import Servant.API (JSON, type (:>))
 import Prelude hiding (log)
 import Domain.Urls.Model (Url(Url, urlId), LongUrl(..))
 import Domain.Urls.Service (Service(shortenUrl))
-import Domain.Has (Has, grab)
+import Domain.Has ( grab)
 
 type Created = Verb 'POST 201
 
@@ -24,6 +23,5 @@ shorten RequestUrl {..} = do
   Url{..} <- shortenUrl service $ LongUrl raw
   return $ ShortenedUrl urlId
 
--- TODO faire alias pour que ce soit plus propre
 server :: forall env m . (Urls.UrlService env m) => ServerT API m
 server = shorten

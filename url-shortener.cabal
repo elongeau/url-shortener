@@ -17,11 +17,13 @@ library
       App.Monad
       Config
       Domain.Has
+      Domain.Repository
       Domain.Urls
       Domain.Urls.Model
       Domain.Urls.Service
       Endpoints.Model
       Endpoints.UrlAPI
+      Infra.Repositories
       UrlShortener
   other-modules:
       Paths_url_shortener
