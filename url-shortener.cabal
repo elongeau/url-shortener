@@ -57,6 +57,7 @@ library
     , bytestring
     , deriving-aeson
     , either
+    , mongoDB
     , mr-env
     , mtl
     , resource-pool
@@ -103,6 +104,7 @@ executable url-shortener
     , bytestring
     , deriving-aeson
     , either
+    , mongoDB
     , mr-env
     , mtl
     , resource-pool
@@ -160,6 +162,7 @@ test-suite spec
     , hspec-wai-json
     , http-client
     , http-types
+    , mongoDB
     , mr-env
     , mtl
     , resource-pool

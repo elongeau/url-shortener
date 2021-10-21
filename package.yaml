@@ -17,6 +17,7 @@ dependencies:
   - resource-pool
   - bytestring
   - mr-env
+  - mongoDB
 
 library:
   source-dirs: src

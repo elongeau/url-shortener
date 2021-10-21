@@ -19,7 +19,7 @@ runAsIO env app = runReaderT (unApp app) env
 runAsHandler :: forall a. AppEnv -> App a -> Handler a
 runAsHandler env app = liftIO $ runAsIO env app
 
-appServer :: forall env m . (Urls.UrlService env m) => ServerT API m
+appServer :: forall env m . (Urls.UrlService env m, MonadIO m) => ServerT API m
 appServer = U.server
 
 server :: AppEnv -> Server API
@@ -35,7 +35,7 @@ setup :: C.Config -> IO AppEnv
 setup C.Config{..} = do 
   let envPort = cfgPort
   let urlService = Urls.service
-  let urlRepository = Infra.urlRepository
+  urlRepository <- Infra.urlRepository
   pure Env{..}
 
 main :: IO ()
@@ -45,5 +45,5 @@ main = do
     Nothing -> putStrLn "Can't connect to DB"
     Just conf -> do
       env <- setup conf
-      putStrLn "Starting Realworld app"
+      putStrLn "Starting Url-Shortener app"
       runApp env
