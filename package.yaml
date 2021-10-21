@@ -18,6 +18,7 @@ dependencies:
   - bytestring
   - mr-env
   - mongoDB
+  - time
 
 library:
   source-dirs: src

@@ -10,6 +10,8 @@ import Servant.Server (Server, serve)
 import qualified Config as C
 import qualified Domain.Urls.Service as Urls
 import qualified Infra.Repositories as Infra
+import Domain.TimeProvider (TimeProvider(TimeProvider, getCurrentTimestamp))
+import Data.Time.Clock.POSIX (getPOSIXTime)
 
 type API = U.API
 
@@ -19,7 +21,7 @@ runAsIO env app = runReaderT (unApp app) env
 runAsHandler :: forall a. AppEnv -> App a -> Handler a
 runAsHandler env app = liftIO $ runAsIO env app
 
-appServer :: forall env m . (Urls.UrlService env m, MonadIO m) => ServerT API m
+appServer :: forall env m . (Urls.UrlService env m) => ServerT API m
 appServer = U.server
 
 server :: AppEnv -> Server API
@@ -34,8 +36,11 @@ runApp env@Env{..} = run envPort $ runServer env
 setup :: C.Config -> IO AppEnv 
 setup C.Config{..} = do 
   let envPort = cfgPort
-  let urlService = Urls.service
-  urlRepository <- Infra.urlRepository
+  let envTimeProvider = TimeProvider {
+    getCurrentTimestamp = liftIO $ round . (* 1000)<$> getPOSIXTime
+  }
+  let envUrlService = Urls.service
+  envUrlRepository <- Infra.urlRepository
   pure Env{..}
 
 main :: IO ()

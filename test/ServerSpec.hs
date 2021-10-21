@@ -20,6 +20,7 @@ import Test.Hspec (Spec, describe, it)
 import Test.Hspec.Wai (ResponseMatcher (matchStatus), WaiSession, get, request, shouldRespondWith, with)
 import UnliftIO (MonadIO (liftIO))
 import UrlShortener (runServer)
+import Domain.TimeProvider (TimeProvider(TimeProvider))
 
 postJson :: (ToJSON a) => BS.ByteString -> a -> WaiSession st SResponse
 postJson path entity = request methodPost path [(hContentType, "application/json")] (encode entity)
@@ -28,8 +29,8 @@ spec :: Spec
 spec = with (fmap runServer env) $ do
   describe "POST /shorten" $ do
     it "responds with shortened URL" $ do
-      _ <- postJson "/shorten" (RequestUrl "http://example.com") `shouldRespondWith` (toMatcher (ShortenedUrl "nope")) { matchStatus = 201}
-      get "/nope" `shouldRespondWith` toMatcher Urls.Url {urlRaw = "http://example.com", urlId = "nope"}
+      _ <- postJson "/shorten" (RequestUrl "http://example.com") `shouldRespondWith` (toMatcher (ShortenedUrl "1L9zO9O")) { matchStatus = 201}
+      get "/1L9zO9O" `shouldRespondWith` toMatcher Urls.Url {urlRaw = "http://example.com", urlId = "1L9zO9O"}
   where
     toMatcher :: (ToJSON a) => a -> ResponseMatcher
     toMatcher = fromString . toString . encode
@@ -56,6 +57,7 @@ spec = with (fmap runServer env) $ do
       pure
         Env
           { envPort = 8080,
-            urlService = Urls.service,
-            urlRepository = urlRepository db
+            envUrlService = Urls.service,
+            envUrlRepository = urlRepository db,
+            envTimeProvider = TimeProvider $ pure 100000000000
           }

@@ -13,7 +13,6 @@ import Domain.Has ( grab)
 import qualified Data.Text as T
 import qualified Domain.Urls as Urls
 import qualified Data.Maybe
-import UnliftIO (liftIO, MonadIO)
 
 type Created = Verb 'POST 201
 
@@ -27,13 +26,12 @@ shorten RequestUrl {..} = do
   Url{..} <- shortenUrl service $ LongUrl raw
   return $ ShortenedUrl urlId
 
-getShortened :: forall env m. (Urls.UrlService env m, MonadIO m) => T.Text -> m Urls.Url 
+getShortened :: forall env m. (Urls.UrlService env m) => T.Text -> m Urls.Url 
 getShortened urlId = do
   service <- grab @(Urls.Service m)
   maybeUrl <- findUrl service urlId
-  liftIO $ print maybeUrl
   pure $ Data.Maybe.fromMaybe (Urls.Url "" "") maybeUrl
 
 
-server :: forall env m . (Urls.UrlService env m, MonadIO m) => ServerT API m
+server :: forall env m . (Urls.UrlService env m) => ServerT API m
 server = shorten :<|> getShortened

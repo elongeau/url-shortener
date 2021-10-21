@@ -18,6 +18,7 @@ library
       Config
       Domain.Has
       Domain.Repository
+      Domain.TimeProvider
       Domain.Urls
       Domain.Urls.Model
       Domain.Urls.Service
