@@ -2,7 +2,7 @@ module ServerSpec where
 
 import App (Env (..))
 import App.Monad (AppEnv)
-import Data.Aeson (ToJSON, encode)
+import Data.Aeson (ToJSON , encode)
 import qualified Data.ByteString as BS
 import Data.ByteString.Lazy.UTF8 (toString)
 import Data.IORef (IORef, newIORef, readIORef, writeIORef)
@@ -17,7 +17,7 @@ import Endpoints.Model (RequestUrl (RequestUrl), ShortenedUrl (ShortenedUrl))
 import Network.HTTP.Types (hContentType, methodPost)
 import Network.Wai.Test (SResponse)
 import Test.Hspec (Spec, describe, it)
-import Test.Hspec.Wai (ResponseMatcher (matchStatus), WaiSession, request, shouldRespondWith, with)
+import Test.Hspec.Wai (ResponseMatcher (matchStatus), WaiSession, get, request, shouldRespondWith, with)
 import UnliftIO (MonadIO (liftIO))
 import UrlShortener (runServer)
 
@@ -28,11 +28,11 @@ spec :: Spec
 spec = with (fmap runServer env) $ do
   describe "POST /shorten" $ do
     it "responds with shortened URL" $ do
-      -- TODO assert que l'URL est en DB: utiliser l'autre endpoint
-      postJson "/shorten" (RequestUrl "http://example.com") `shouldRespondWith` shortenedUrl {matchStatus = 201}
+      _ <- postJson "/shorten" (RequestUrl "http://example.com") `shouldRespondWith` (toMatcher (ShortenedUrl "nope")) { matchStatus = 201}
+      get "/nope" `shouldRespondWith` toMatcher Urls.Url {urlRaw = "http://example.com", urlId = "nope"}
   where
-    shortenedUrl :: ResponseMatcher
-    shortenedUrl = fromString . toString . encode . ShortenedUrl $ "nope"
+    toMatcher :: (ToJSON a) => a -> ResponseMatcher
+    toMatcher = fromString . toString . encode
 
     urlRepository :: (MonadIO m) => IORef (Map T.Text Url) -> Urls.UrlRepository m
     urlRepository ref =
