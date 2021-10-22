@@ -10,10 +10,10 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.String (IsString (fromString))
 import qualified Data.Text as T
-import Domain.Repository (Repository (Repository, findById, save))
-import Domain.TimeProvider (TimeProvider (TimeProvider))
-import Domain.Urls (Url (urlId))
-import qualified Domain.Urls as Urls
+import Core.Repository (Repository (Repository, findById, save))
+import Core.TimeProvider (TimeProvider (TimeProvider))
+import Core.Urls (Url (urlId))
+import qualified Core.Urls as Urls
 import Endpoints.Model (RequestUrl (RequestUrl), ShortenedUrl (ShortenedUrl))
 import Network.HTTP.Types (hContentType, methodPost)
 import Network.Wai.Test (SResponse)
@@ -27,10 +27,12 @@ postJson path entity = request methodPost path [(hContentType, "application/json
 
 spec :: Spec
 spec = with (fmap runServer env) $ do
-  describe "POST /shorten" $ do
-    it "responds with shortened URL" $ do
+  describe "Using the API" $ do
+    it "creates a short URL and then redirect to original url" $ do
       _ <- postJson "/shorten" (RequestUrl "http://example.com") `shouldRespondWith` (toMatcher (ShortenedUrl "1L9zO9O")) {matchStatus = 201}
       get "/1L9zO9O" `shouldRespondWith` 301 {matchHeaders = ["Location" <:> "http://example.com"]}
+    it "responds Not Found when short url is unknown" $ do
+      get "/unknown" `shouldRespondWith` 404
   where
     toMatcher :: (ToJSON a) => a -> ResponseMatcher
     toMatcher = fromString . toString . encode

@@ -5,8 +5,8 @@ module Infra.Repositories where
 import App (App)
 import qualified Data.Text as T
 import Database.MongoDB (Action, Document, Field ((:=)), Pipe, Val (val), access, auth, connect, findOne, host, insert, master, select, (!?))
-import Domain.Repository (Repository (Repository, findById, save))
-import qualified Domain.Urls as Urls
+import Core.Repository (Repository (Repository, findById, save))
+import qualified Core.Urls as Urls
 import UnliftIO (MonadIO (liftIO))
 import Prelude hiding (id)
 

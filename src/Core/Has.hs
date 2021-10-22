@@ -1,4 +1,4 @@
-module Domain.Has where
+module Core.Has where
 
 import Control.Monad.Reader (MonadReader, asks)
 class Has field env where

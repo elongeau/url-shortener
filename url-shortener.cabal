@@ -16,12 +16,13 @@ library
       App.Env
       App.Monad
       Config
-      Domain.Has
-      Domain.Repository
-      Domain.TimeProvider
-      Domain.Urls
-      Domain.Urls.Model
-      Domain.Urls.Service
+      Core.Error
+      Core.Has
+      Core.Repository
+      Core.TimeProvider
+      Core.Urls
+      Core.Urls.Model
+      Core.Urls.Service
       Endpoints.Model
       Endpoints.UrlAPI
       Infra.Repositories

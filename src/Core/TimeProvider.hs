@@ -1,4 +1,4 @@
-module Domain.TimeProvider where
+module Core.TimeProvider where
 
 -- | provide the current timestamp
 newtype TimeProvider m = TimeProvider

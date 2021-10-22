@@ -6,7 +6,7 @@
 
 module Endpoints.UrlAPI (server, API) where
 
-import qualified Domain.Urls.Service as Urls
+import qualified Core.Urls.Service as Urls
 import Endpoints.Model (RequestUrl (RequestUrl, raw), ShortenedUrl (ShortenedUrl))
 import Servant
     ( addHeader,
@@ -22,13 +22,13 @@ import Servant
       type (:>),
       Verb,
       HasServer(ServerT) )
-import Domain.Urls.Model (Url(Url, urlId, urlRaw), LongUrl(..))
-import Domain.Urls.Service (Service(shortenUrl, findUrl))
-import Domain.Has ( grab)
+import Core.Urls.Model (Url(Url, urlId, urlRaw), LongUrl(..))
+import Core.Urls.Service (Service(shortenUrl, findUrl))
+import Core.Has ( grab)
 import qualified Data.Text as T
-import qualified Domain.Urls as Urls
-import qualified Data.Maybe
+import qualified Core.Urls as Urls
 import qualified Data.Text.Encoding as T
+import Core.Error (WithError, throwError, AppErrorType (NotFound))
 
 type Created = Verb 'POST 201
 type Redirect loc = Verb 'GET 301 '[JSON] (Headers '[Header "Location" loc] NoContent)
@@ -49,12 +49,13 @@ instance ToHttpApiData UrlForHeader  where
   toHeader (UrlForHeader (Urls.Url raw _)) = T.encodeUtf8 raw
   toUrlPiece = undefined 
 
-redirect :: forall env m. (Urls.UrlService env m) => T.Text -> m (Headers '[Header "Location" UrlForHeader] NoContent)
+redirect :: forall env m. (Urls.UrlService env m, WithError m) => T.Text -> m (Headers '[Header "Location" UrlForHeader] NoContent)
 redirect urlId = do
   service <- grab @(Urls.Service m)
   maybeUrl <- findUrl service urlId
-  let url = UrlForHeader $ Data.Maybe.fromMaybe (Urls.Url "" "") maybeUrl
-  return (addHeader url NoContent)
+  case maybeUrl of
+    Nothing -> throwError NotFound 
+    Just url -> return (addHeader (UrlForHeader url) NoContent)
 
-server :: forall env m . (Urls.UrlService env m) => ServerT API m
+server :: forall env m . (Urls.UrlService env m, WithError m) => ServerT API m
 server = shorten :<|> redirect

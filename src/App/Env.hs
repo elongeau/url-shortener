@@ -4,9 +4,9 @@
 module App.Env (Env (..)) where
 
 import Control.Monad.Reader (MonadReader)
-import Domain.Has (Has (obtain))
-import Domain.TimeProvider (TimeProvider)
-import qualified Domain.Urls as Urls
+import Core.Has (Has (obtain))
+import Core.TimeProvider (TimeProvider)
+import qualified Core.Urls as Urls
 
 data Env m = Env
   { envPort :: Int,

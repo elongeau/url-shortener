@@ -1,4 +1,4 @@
-module Domain.Urls.Model where
+module Core.Urls.Model where
 
 import Data.Aeson (ToJSON)
 import qualified Data.Text as T

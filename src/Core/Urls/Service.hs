@@ -1,13 +1,13 @@
 {-# LANGUAGE ConstraintKinds #-}
 
-module Domain.Urls.Service (Service (..), service, UrlService, UrlRepository, toBase62) where
+module Core.Urls.Service (Service (..), service, UrlService, UrlRepository, toBase62) where
 
 import Control.Monad.Reader (MonadReader)
-import Domain.Has (Has, grab)
-import Domain.Urls.Model (LongUrl (..), Url (..))
+import Core.Has (Has, grab)
+import Core.Urls.Model (LongUrl (..), Url (..))
 import qualified Data.Text as T
-import Domain.Repository (Repository (save, findById))
-import Domain.TimeProvider (TimeProvider (getCurrentTimestamp))
+import Core.Repository (Repository (save, findById))
+import Core.TimeProvider (TimeProvider (getCurrentTimestamp))
 
 data Service m = Service
   { shortenUrl :: LongUrl -> m Url,
