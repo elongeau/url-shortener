@@ -1,7 +1,7 @@
 module ConfigSpec where
 
 import Config (Config (Config), loadConfig)
-import Data.ByteString.Char8 (pack)
+import qualified Data.Text as T
 import System.Environment (setEnv)
 import Test.Hspec (Spec, before, describe, it, shouldBe)
 
@@ -10,28 +10,19 @@ spec = describe "loading configuration" $ do
   before cleanEnv $
     describe "from environment variables" $ do
       it "should load config when all variables are set" $ do
-        setEnv "port" "1234"
-        setEnv "db_credentials" "cred"
+        setEnv "SERVER_PORT" "1234"
+        setEnv "MONGO_HOST" "127.0.0.1"
+        setEnv "MONGO_USER" "user"
+        setEnv "MONGO_PASSWORD" "pwd"
         cfg <- loadConfig
-        cfg `shouldBe` Just (Config 1234 (pack "cred"))
-      it "should use default port when it's missing" $ do
-        setEnv "db_credentials" "cred"
+        cfg `shouldBe` Config 1234 "127.0.0.1" (T.pack "user") (T.pack "pwd")
+      it "should use default values" $ do
         cfg <- loadConfig
-        cfg `shouldBe` Just (Config 8080 (pack "cred"))
-      it "should return nothing when db_credentials are missing" do
-        setEnv "port" "1234"
-        cfg <- loadConfig
-        cfg `shouldBe` Nothing
-      it "should return nothing when all are missing" do
-        cfg <- loadConfig
-        cfg `shouldBe` Nothing
-      it "should return nothing when db_credentials are empty" $ do
-        setEnv "port" "1234"
-        setEnv "db_credentials" ""
-        cfg <- loadConfig
-        cfg `shouldBe` Nothing
+        cfg `shouldBe` Config 8080 "localhost" (T.pack "root") (T.pack "password")
 
 cleanEnv :: IO ()
 cleanEnv = do
-  setEnv "port" ""
-  setEnv "db_credentials" ""
+  setEnv "SERVER_PORT" ""
+  setEnv "MONGO_HOST" ""
+  setEnv "MONGO_USER" ""
+  setEnv "MONGO_PASSWORD" ""

@@ -14,7 +14,6 @@ dependencies:
   - either
   - time
   - unliftio
-  - resource-pool
   - bytestring
   - mr-env
   - mongoDB

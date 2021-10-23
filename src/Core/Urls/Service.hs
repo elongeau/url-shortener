@@ -15,11 +15,13 @@ data Service m = Service
   }
 
 type UrlRepository m = Repository m T.Text Url
+type UrlService env m = (MonadReader env m, Has (Service m) env)
+type ServiceConstraints env m= (MonadReader env m, Has (UrlRepository m) env, Has (TimeProvider m) env)
 
-service :: (MonadReader env m, Has (UrlRepository m) env, Has (TimeProvider m) env) => Service m
+service :: ServiceConstraints env m => Service m
 service = Service {shortenUrl = shortUrl, findUrl = findUrlById}
 
-shortUrl :: forall env m. (MonadReader env m, Has (UrlRepository m) env, Has (TimeProvider m) env) => LongUrl -> m Url
+shortUrl :: forall env m. ServiceConstraints env m => LongUrl -> m Url
 shortUrl LongUrl {..} = do
   repo <- grab @(UrlRepository m)
   timestamp <- grab @(TimeProvider m) >>= getCurrentTimestamp
@@ -30,7 +32,7 @@ shortUrl LongUrl {..} = do
         urlId = urlId
       }
 
-findUrlById:: forall env m. (MonadReader env m, Has (UrlRepository m) env) => T.Text -> m (Maybe Url)
+findUrlById:: forall env m. ServiceConstraints env m => T.Text -> m (Maybe Url)
 findUrlById urlId = do 
   repo <- grab @(UrlRepository m)
   findById repo urlId
@@ -46,4 +48,3 @@ toBase62 x =
     characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
 
 
-type UrlService env m = (MonadReader env m, Has (Service m) env)

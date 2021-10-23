@@ -1,20 +1,20 @@
 module Config (Config (..), loadConfig) where
 
-import Data.ByteString (ByteString)
-import Data.ByteString.Char8 (pack)
+import qualified Data.Text as T
 import System.Environment.MrEnv (envAsInt, envAsString)
 
 data Config = Config
   { cfgPort :: Int,
-    cfgDbCredentials :: ByteString
+    cfgMongoHost :: String,
+    cfgMongoUser :: T.Text,
+    cfgMongoPassword :: T.Text
   }
   deriving stock (Show, Eq)
 
-loadConfig :: IO (Maybe Config)
+loadConfig :: IO Config
 loadConfig = do
-  dbCred <- envAsString "db_credentials" ""
-  port <- envAsInt "port" 8080
-  pure $
-    if null dbCred
-      then Nothing
-      else Just $ Config port (pack dbCred)
+  cfgPort <- envAsInt "SERVER_PORT" 8080
+  cfgMongoHost <- envAsString "MONGO_HOST" "localhost"
+  cfgMongoUser <- T.pack <$> envAsString "MONGO_USER" "root"
+  cfgMongoPassword <- T.pack <$> envAsString "MONGO_PASSWORD" "password"
+  pure Config {..}

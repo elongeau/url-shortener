@@ -17,6 +17,8 @@ import Data.Either.Combinators (mapLeft)
 import Data.Bifunctor (first)
 import Control.Monad.Error.Class (liftEither)
 import Core.Error (AppError(AppError, appErrorType), AppErrorType (NotFound), AppException (unAppException), WithError)
+import Database.MongoDB (connect, access, master, auth)
+import Database.MongoDB.Connection (host)
 
 type API = U.API
 
@@ -52,20 +54,19 @@ runIO env@Env{..} = run envPort $ runServer env
 
 setup :: C.Config -> IO AppEnv 
 setup C.Config{..} = do 
+  pipe <- liftIO $ connect (host cfgMongoHost)
+  _ <- liftIO $ access pipe master "admin" $ auth cfgMongoUser cfgMongoPassword
   let envPort = cfgPort
   let envTimeProvider = TimeProvider {
     getCurrentTimestamp = liftIO $ round . (* 1000)<$> getPOSIXTime
   }
   let envUrlService = Urls.service
-  envUrlRepository <- Infra.urlRepository
+  let envUrlRepository = Infra.mkUrlRepository pipe
   pure Env{..}
 
 main :: IO ()
 main = do
-  maybeConf <- C.loadConfig
-  case maybeConf of
-    Nothing -> putStrLn "Can't connect to DB"
-    Just conf -> do
-      env <- setup conf
-      putStrLn "Starting Url-Shortener app"
-      runIO env
+  conf <- C.loadConfig
+  env <- setup conf
+  putStrLn "Starting Url-Shortener app"
+  runIO env
