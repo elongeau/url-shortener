@@ -16,7 +16,7 @@ import qualified Data.Text as T
 import Endpoints.Model (RequestUrl (RequestUrl), ShortenedUrl (ShortenedUrl))
 import Network.HTTP.Types (hContentType, methodPost)
 import Network.Wai.Test (SResponse)
-import Test.Hspec (Spec, describe, it, runIO)
+import Test.Hspec (Spec, before, describe, it, runIO)
 import Test.Hspec.Wai (ResponseMatcher (matchHeaders, matchStatus), WaiSession, get, request, shouldRespondWith, with, (<:>))
 import UnliftIO (MonadIO (liftIO))
 import UrlShortener (runServer)
@@ -29,14 +29,16 @@ spec = do
   db <- runIO ioDb
   timeRef <- runIO ioTimeRef
   let env = mkEnv db timeRef
-  with (pure $ runServer env) $ do
+  before (cleanDB db) . with (pure $ runServer env) $ do
     describe "Using the API" $ do
       it "creates a short URL and then redirect to original url" $ do
-        -- _ <- liftIO $ changeTime timeRef 1
         _ <- postJson "/shorten" (RequestUrl "http://example.com") `shouldRespondWith` (toMatcher (ShortenedUrl "1L9zO9O")) {matchStatus = 201}
         get "/1L9zO9O" `shouldRespondWith` 301 {matchHeaders = ["Location" <:> "http://example.com"]}
-      it "responds Not Found when short url is unknown" $ do
+      it "responds Not-Found when short url is unknown" $ do
         get "/unknown" `shouldRespondWith` 404
+      it "fails on existing ID" $ do
+        _ <- postJson "/shorten" (RequestUrl "http://example.com")
+        postJson "/shorten" (RequestUrl "http://example.com") `shouldRespondWith` 409
 
 toMatcher :: (ToJSON a) => a -> ResponseMatcher
 toMatcher = fromString . toString . encode
@@ -61,10 +63,6 @@ ioDb = newIORef Map.empty
 
 ioTimeRef :: IO (IORef Int)
 ioTimeRef = newIORef 100000000000
-
-changeTime :: IORef Int -> Int -> IO ()
-changeTime ref newTime = do
-  writeIORef ref newTime
 
 timeProvider :: MonadIO m => IORef Int -> TimeProvider m
 timeProvider ref =

@@ -5,7 +5,7 @@ import App.Monad ( App, AppEnv, runApp  )
 import Control.Monad.Reader (MonadIO (liftIO))
 import qualified Endpoints.UrlAPI as U
 import Network.Wai.Handler.Warp (run)
-import Servant (Application, Handler, Proxy (Proxy), hoistServer, ServerT, ServerError, err404)
+import Servant (Application, Handler, Proxy (Proxy), hoistServer, ServerT, ServerError, err404, err409)
 import Servant.Server (Server, serve)
 import qualified Config as C
 import qualified Infra.Repositories as Infra
@@ -15,7 +15,7 @@ import Control.Exception (try)
 import Data.Either.Combinators (mapLeft)
 import Data.Bifunctor (first)
 import Control.Monad.Error.Class (liftEither)
-import Core.Error (AppError(AppError, appErrorType), AppErrorType (NotFound), AppException (unAppException), WithError)
+import Core.Error (AppError(AppError, appErrorType), AppErrorType (NotFound, ConcurrentAccess), AppException (unAppException), WithError)
 import Database.MongoDB (connect, access, master, auth)
 import Database.MongoDB.Connection (host)
 import Core.Repository (WithUrlRepository)
@@ -37,6 +37,7 @@ runAsHandler env app = do
 toHttpError :: AppError -> ServerError
 toHttpError AppError {..} = case appErrorType of
   NotFound -> err404
+  ConcurrentAccess ->   err409
 
 appServer :: forall env m . (WithError m, WithUrlRepository env m, WithTimeProvider env m) => ServerT API m
 appServer = U.server

@@ -10,11 +10,11 @@ module App.Monad
 where
 
 import App.Env (Env)
-import Core.Error (AppError, AppException (AppException))
 import Control.Exception (catch, throwIO)
 import Control.Monad.Error.Class (MonadError (catchError, throwError))
 import Control.Monad.Except (MonadIO (liftIO))
 import Control.Monad.Reader (MonadReader, ReaderT (ReaderT, runReaderT))
+import Core.Error (AppError, AppException (AppException))
 import UnliftIO (MonadUnliftIO)
 
 newtype App a = App

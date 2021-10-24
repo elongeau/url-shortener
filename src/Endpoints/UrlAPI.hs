@@ -27,7 +27,7 @@ import Core.Has ( grab)
 import qualified Data.Text as T
 import qualified Core.Urls as Urls
 import qualified Data.Text.Encoding as T
-import Core.Error (WithError, throwError, AppErrorType (NotFound))
+import Core.Error (WithError, throwError, AppErrorType (NotFound, ConcurrentAccess))
 import Core.TimeProvider (TimeProvider (getCurrentTimestamp), WithTimeProvider)
 import Core.Repository (UrlRepository, Repository (findById, save), WithUrlRepository)
 
@@ -37,13 +37,21 @@ type Redirect loc = Verb 'GET 301 '[JSON] (Headers '[Header "Location" loc] NoCo
 type API = "shorten" :> ReqBody '[JSON] RequestUrl :> Created '[JSON] ShortenedUrl
   :<|> Capture "id" T.Text :> Redirect UrlForHeader
 
-shorten :: forall env m. (WithTimeProvider env m, WithUrlRepository env m) => RequestUrl -> m ShortenedUrl
-shorten RequestUrl {..} = do
-  repo <- grab @(UrlRepository m)
-  timestamp <- grab @(TimeProvider m) >>= getCurrentTimestamp
-  let url@Url{..} = Urls.shortenUrl timestamp $ LongUrl raw
-  _ <- save repo url
-  return $ ShortenedUrl urlId
+shorten :: forall env m. (WithError m, WithTimeProvider env m, WithUrlRepository env m) => RequestUrl -> m ShortenedUrl
+shorten RequestUrl {..} = go 3
+  where 
+    go :: Int -> m ShortenedUrl
+    go 0 = throwError ConcurrentAccess
+    go n = do
+      repo <- grab @(UrlRepository m)
+      timestamp <- grab @(TimeProvider m) >>= getCurrentTimestamp
+      let url@Url{..} = Urls.shortenUrl timestamp $ LongUrl raw
+      maybeAlreadyExists <- findById repo urlId
+      case maybeAlreadyExists of
+        Nothing -> do 
+          _ <- save repo url
+          pure $ ShortenedUrl urlId 
+        Just _ -> go $ n - 1
 
 newtype UrlForHeader = UrlForHeader Urls.Url 
 instance ToHttpApiData UrlForHeader  where

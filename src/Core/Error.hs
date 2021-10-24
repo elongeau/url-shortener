@@ -20,7 +20,10 @@ newtype AppError = AppError
   }
   deriving stock (Show, Eq)
 
-data AppErrorType = NotFound deriving stock (Show, Eq)
+data AppErrorType
+  = NotFound
+  | ConcurrentAccess
+  deriving stock (Show, Eq)
 
 type WithError m = MonadError AppError m
 
