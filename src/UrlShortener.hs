@@ -8,9 +8,8 @@ import Network.Wai.Handler.Warp (run)
 import Servant (Application, Handler, Proxy (Proxy), hoistServer, ServerT, ServerError, err404)
 import Servant.Server (Server, serve)
 import qualified Config as C
-import qualified Core.Urls.Service as Urls
 import qualified Infra.Repositories as Infra
-import Core.TimeProvider (TimeProvider(TimeProvider, getCurrentTimestamp))
+import Core.TimeProvider (TimeProvider(TimeProvider, getCurrentTimestamp), WithTimeProvider)
 import Data.Time.Clock.POSIX (getPOSIXTime)
 import Control.Exception (try)
 import Data.Either.Combinators (mapLeft)
@@ -19,6 +18,7 @@ import Control.Monad.Error.Class (liftEither)
 import Core.Error (AppError(AppError, appErrorType), AppErrorType (NotFound), AppException (unAppException), WithError)
 import Database.MongoDB (connect, access, master, auth)
 import Database.MongoDB.Connection (host)
+import Core.Repository (WithUrlRepository)
 
 type API = U.API
 
@@ -38,9 +38,7 @@ toHttpError :: AppError -> ServerError
 toHttpError AppError {..} = case appErrorType of
   NotFound -> err404
 
-
-
-appServer :: forall env m . (Urls.UrlService env m, WithError m) => ServerT API m
+appServer :: forall env m . (WithError m, WithUrlRepository env m, WithTimeProvider env m) => ServerT API m
 appServer = U.server
 
 server :: AppEnv -> Server API
@@ -60,7 +58,6 @@ setup C.Config{..} = do
   let envTimeProvider = TimeProvider {
     getCurrentTimestamp = liftIO $ round . (* 1000)<$> getPOSIXTime
   }
-  let envUrlService = Urls.service
   let envUrlRepository = Infra.mkUrlRepository pipe
   pure Env{..}
 

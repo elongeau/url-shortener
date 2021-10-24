@@ -23,39 +23,40 @@ import Servant
       Verb,
       HasServer(ServerT) )
 import Core.Urls.Model (Url(Url, urlId, urlRaw), LongUrl(..))
-import Core.Urls.Service (Service(shortenUrl, findUrl))
 import Core.Has ( grab)
 import qualified Data.Text as T
 import qualified Core.Urls as Urls
 import qualified Data.Text.Encoding as T
 import Core.Error (WithError, throwError, AppErrorType (NotFound))
+import Core.TimeProvider (TimeProvider (getCurrentTimestamp), WithTimeProvider)
+import Core.Repository (UrlRepository, Repository (findById, save), WithUrlRepository)
 
 type Created = Verb 'POST 201
 type Redirect loc = Verb 'GET 301 '[JSON] (Headers '[Header "Location" loc] NoContent)
 
-
--- mettre un warning sur l'absence d'authentification: une même URL d'utilisateur différent aura quand même la même version raccourci
 type API = "shorten" :> ReqBody '[JSON] RequestUrl :> Created '[JSON] ShortenedUrl
   :<|> Capture "id" T.Text :> Redirect UrlForHeader
 
-shorten :: forall env m. (Urls.UrlService env m) => RequestUrl -> m ShortenedUrl
+shorten :: forall env m. (WithTimeProvider env m, WithUrlRepository env m) => RequestUrl -> m ShortenedUrl
 shorten RequestUrl {..} = do
-  service <- grab @(Urls.Service m)
-  Url{..} <- shortenUrl service $ LongUrl raw
+  repo <- grab @(UrlRepository m)
+  timestamp <- grab @(TimeProvider m) >>= getCurrentTimestamp
+  let url@Url{..} = Urls.shortenUrl timestamp $ LongUrl raw
+  _ <- save repo url
   return $ ShortenedUrl urlId
 
 newtype UrlForHeader = UrlForHeader Urls.Url 
 instance ToHttpApiData UrlForHeader  where
   toHeader (UrlForHeader (Urls.Url raw _)) = T.encodeUtf8 raw
-  toUrlPiece = undefined 
+  toUrlPiece = undefined -- not used
 
-redirect :: forall env m. (Urls.UrlService env m, WithError m) => T.Text -> m (Headers '[Header "Location" UrlForHeader] NoContent)
+redirect :: forall env m. (WithError m, WithUrlRepository env m) => T.Text -> m (Headers '[Header "Location" UrlForHeader] NoContent)
 redirect urlId = do
-  service <- grab @(Urls.Service m)
-  maybeUrl <- findUrl service urlId
+  repo <- grab @(UrlRepository m)
+  maybeUrl <- findById repo urlId
   case maybeUrl of
     Nothing -> throwError NotFound 
     Just url -> return (addHeader (UrlForHeader url) NoContent)
 
-server :: forall env m . (Urls.UrlService env m, WithError m) => ServerT API m
+server :: forall env m . (WithError m, WithUrlRepository env m, WithTimeProvider env m) => ServerT API m
 server = shorten :<|> redirect

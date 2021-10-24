@@ -4,5 +4,5 @@ module Core.Urls
   )
 where
 
-import Core.Urls.Model
-import Core.Urls.Service
+import Core.Urls.Model (LongUrl (..), Url (..))
+import Core.Urls.Service (shortenUrl)

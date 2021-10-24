@@ -3,14 +3,14 @@
 module Infra.Repositories where
 
 import App (App)
-import Core.Repository (Repository (Repository, findById, save))
+import Core.Repository (Repository (Repository, findById, save), UrlRepository)
 import qualified Core.Urls as Urls
 import qualified Data.Text as T
 import Database.MongoDB (Action, Document, Field ((:=)), Pipe, Val (val), access, findOne, insert, master, select, (!?))
 import UnliftIO (MonadIO (liftIO))
 import Prelude hiding (id)
 
-mkUrlRepository :: Pipe -> Urls.UrlRepository App
+mkUrlRepository :: Pipe -> UrlRepository App
 mkUrlRepository pipe =
   Repository
     { save = save,

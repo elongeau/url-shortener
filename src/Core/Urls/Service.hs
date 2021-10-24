@@ -1,50 +1,26 @@
 {-# LANGUAGE ConstraintKinds #-}
 
-module Core.Urls.Service (Service (..), service, UrlService, UrlRepository, toBase62) where
+module Core.Urls.Service (shortenUrl) where
 
-import Control.Monad.Reader (MonadReader)
-import Core.Has (Has, grab)
 import Core.Urls.Model (LongUrl (..), Url (..))
 import qualified Data.Text as T
-import Core.Repository (Repository (save, findById))
-import Core.TimeProvider (TimeProvider (getCurrentTimestamp))
 
-data Service m = Service
-  { shortenUrl :: LongUrl -> m Url,
-    findUrl :: T.Text -> m (Maybe Url)
-  }
-
-type UrlRepository m = Repository m T.Text Url
-type UrlService env m = (MonadReader env m, Has (Service m) env)
-type ServiceConstraints env m= (MonadReader env m, Has (UrlRepository m) env, Has (TimeProvider m) env)
-
-service :: ServiceConstraints env m => Service m
-service = Service {shortenUrl = shortUrl, findUrl = findUrlById}
-
-shortUrl :: forall env m. ServiceConstraints env m => LongUrl -> m Url
-shortUrl LongUrl {..} = do
-  repo <- grab @(UrlRepository m)
-  timestamp <- grab @(TimeProvider m) >>= getCurrentTimestamp
+shortenUrl :: Int -> LongUrl -> Url
+shortenUrl timestamp LongUrl {..} =
   let urlId = toBase62 timestamp
-  save repo $
-    Url
-      { urlRaw = lgUrl,
-        urlId = urlId
-      }
+   in Url
+        { urlRaw = lgUrl,
+          urlId = urlId
+        }
 
-findUrlById:: forall env m. ServiceConstraints env m => T.Text -> m (Maybe Url)
-findUrlById urlId = do 
-  repo <- grab @(UrlRepository m)
-  findById repo urlId
-
-toBase62 :: Int -> T.Text 
-toBase62 x = 
-  if x == 0 then ""
-  else let v = x `mod` 62
-           c = T.index characters v
-       in T.snoc (toBase62 (x `div` 62))  c
+toBase62 :: Int -> T.Text
+toBase62 x =
+  if x == 0
+    then ""
+    else
+      let v = x `mod` 62
+          c = T.index characters v
+       in T.snoc (toBase62 (x `div` 62)) c
   where
     characters :: T.Text
     characters = "0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
-
-
