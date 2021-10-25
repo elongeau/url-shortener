@@ -4,7 +4,7 @@
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Endpoints.UrlAPI (routes, API) where
+module Endpoints.UrlAPI (UrlRoutes(..), shorten, redirect) where
 
 import Endpoints.Model (RequestUrl (RequestUrl, raw), ShortenedUrl (ShortenedUrl), BaseUrl(..))
 import Servant
@@ -21,28 +21,17 @@ import Servant
       Verb )
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
-import Servant.API.Generic (type (:-), ToServantApi)
-import Infra (App)
-import Servant.Server.Generic (AsServerT)
+import Servant.API.Generic (type (:-))
 import GHC.Generics (Generic)
 import Core (WithError, WithTimeProvider, WithUrlRepository, Has, UrlRepository, TimeProvider (getCurrentTimestamp), Url(..), grab, Repository (findById, save), throwError, AppErrorType (NotFound, ConcurrentAccess), shortenUrl, LongUrl(..))
 
 type Created = Verb 'POST 201
 type Redirect loc = Verb 'GET 301 '[JSON] (Headers '[Header "Location" loc] NoContent)
-type AppServer = AsServerT App
 
 data UrlRoutes route = UrlRoutes {
   _shorten :: route :- "shorten" :> ReqBody '[JSON] RequestUrl :> Created '[JSON] ShortenedUrl,
   _redirect :: route :- Capture "id" T.Text :> Redirect UrlForHeader 
 } deriving stock Generic
-
-type API = ToServantApi UrlRoutes
-
-routes :: UrlRoutes AppServer
-routes = UrlRoutes {
-  _shorten = shorten,
-  _redirect = redirect
-}
 
 shorten :: forall env m. (WithError m, WithTimeProvider env m, WithUrlRepository env m, Has BaseUrl env) => RequestUrl -> m ShortenedUrl
 shorten RequestUrl {..} = go 3 -- tries 3 times before giving up

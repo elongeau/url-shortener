@@ -18,6 +18,7 @@ library
       Core.Urls
       Core.Urls.Model
       Core.Urls.Service
+      Endpoints
       Endpoints.Model
       Endpoints.UrlAPI
       Infra
@@ -26,6 +27,7 @@ library
       Infra.App.Monad
       Infra.Config
       Infra.MongoRepository
+      Infra.Routes
       UrlShortener
   hs-source-dirs:
       src

@@ -5,4 +5,4 @@ module Infra.App
 where
 
 import Infra.App.Env (Env (..))
-import Infra.App.Monad (App (..), AppEnv)
+import Infra.App.Monad (App (..), AppEnv,runApp)

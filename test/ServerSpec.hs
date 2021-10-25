@@ -8,8 +8,7 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.String (IsString (fromString))
 import qualified Data.Text as T
-import Endpoints.Model (BaseUrl (BaseUrl), RequestUrl (RequestUrl), ShortenedUrl (ShortenedUrl))
-import qualified Infra as I
+import Endpoints (BaseUrl (BaseUrl), RequestUrl (RequestUrl), ShortenedUrl (ShortenedUrl))
 import Network.HTTP.Types (hContentType, methodPost)
 import Network.Wai.Test (SResponse)
 import Test.Hspec (Spec, before, describe, it, runIO)
@@ -17,6 +16,7 @@ import Test.Hspec.Wai (ResponseMatcher (matchHeaders, matchStatus), WaiSession, 
 import UnliftIO (MonadIO (liftIO))
 import UrlShortener (runServer)
 import Core (Url(Url, urlId), UrlRepository,Repository(Repository, save, findById), TimeProvider(..))
+import Infra (AppEnv, Env(..))
 
 spec :: Spec
 spec = do
@@ -69,9 +69,9 @@ timeProvider ref =
 cleanDB :: IORef DB -> IO ()
 cleanDB ref = writeIORef ref Map.empty
 
-mkEnv :: IORef DB -> IORef Int -> I.AppEnv
+mkEnv :: IORef DB -> IORef Int -> AppEnv
 mkEnv db timeRef =
-  I.Env
+  Env
     { envPort = 8080,
       envUrlRepository = urlRepository db,
       envTimeProvider = timeProvider timeRef,
