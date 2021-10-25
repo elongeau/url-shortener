@@ -4,7 +4,7 @@
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Endpoints.UrlAPI (server, API) where
+module Endpoints.UrlAPI (routes, API) where
 
 import qualified Core.Urls.Service as Urls
 import Endpoints.Model (RequestUrl (RequestUrl, raw), ShortenedUrl (ShortenedUrl))
@@ -12,7 +12,6 @@ import Servant
     ( addHeader,
       ToHttpApiData(..),
       StdMethod(POST, GET),
-      type (:<|>)(..),
       Capture,
       JSON,
       NoContent(..),
@@ -20,8 +19,7 @@ import Servant
       ReqBody,
       Headers,
       type (:>),
-      Verb,
-      HasServer(ServerT) )
+      Verb )
 import Core.Urls.Model (Url(Url, urlId, urlRaw), LongUrl(..))
 import Core.Has ( grab)
 import qualified Data.Text as T
@@ -30,12 +28,27 @@ import qualified Data.Text.Encoding as T
 import Core.Error (WithError, throwError, AppErrorType (NotFound, ConcurrentAccess))
 import Core.TimeProvider (TimeProvider (getCurrentTimestamp), WithTimeProvider)
 import Core.Repository (UrlRepository, Repository (findById, save), WithUrlRepository)
+import Servant.API.Generic (type (:-), ToServantApi)
+import Infra (App)
+import Servant.Server.Generic (AsServerT)
+import GHC.Generics (Generic)
 
 type Created = Verb 'POST 201
 type Redirect loc = Verb 'GET 301 '[JSON] (Headers '[Header "Location" loc] NoContent)
+type AppServer = AsServerT App
 
-type API = "shorten" :> ReqBody '[JSON] RequestUrl :> Created '[JSON] ShortenedUrl
-  :<|> Capture "id" T.Text :> Redirect UrlForHeader
+data UrlRoutes route = UrlRoutes {
+  _shorten :: route :- "shorten" :> ReqBody '[JSON] RequestUrl :> Created '[JSON] ShortenedUrl,
+  _redirect :: route :- Capture "id" T.Text :> Redirect UrlForHeader 
+} deriving stock Generic
+
+type API = ToServantApi UrlRoutes
+
+routes :: UrlRoutes AppServer
+routes = UrlRoutes {
+  _shorten = shorten,
+  _redirect = redirect
+}
 
 shorten :: forall env m. (WithError m, WithTimeProvider env m, WithUrlRepository env m) => RequestUrl -> m ShortenedUrl
 shorten RequestUrl {..} = go 3 -- tries 3 times before giving up
@@ -65,6 +78,3 @@ redirect urlId = do
   case maybeUrl of
     Nothing -> throwError NotFound 
     Just url -> return (addHeader (UrlForHeader url) NoContent)
-
-server :: forall env m . (WithError m, WithUrlRepository env m, WithTimeProvider env m) => ServerT API m
-server = shorten :<|> redirect
