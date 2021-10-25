@@ -1,8 +1,5 @@
 module ServerSpec where
 
-import Core.Repository (Repository (Repository, findById, save), UrlRepository)
-import Core.TimeProvider (TimeProvider (TimeProvider))
-import qualified Core.Urls as Urls
 import Data.Aeson (ToJSON, encode)
 import qualified Data.ByteString as BS
 import Data.ByteString.Lazy.UTF8 (toString)
@@ -19,6 +16,7 @@ import Test.Hspec (Spec, before, describe, it, runIO)
 import Test.Hspec.Wai (ResponseMatcher (matchHeaders, matchStatus), WaiSession, get, request, shouldRespondWith, with, (<:>))
 import UnliftIO (MonadIO (liftIO))
 import UrlShortener (runServer)
+import Core (Url(Url, urlId), UrlRepository,Repository(Repository, save, findById), TimeProvider(..))
 
 spec :: Spec
 spec = do
@@ -42,12 +40,12 @@ postJson path entity = request methodPost path [(hContentType, "application/json
 toMatcher :: (ToJSON a) => a -> ResponseMatcher
 toMatcher = fromString . toString . encode
 
-type DB = Map T.Text Urls.Url
+type DB = Map T.Text Url
 
 urlRepository :: (MonadIO m) => IORef DB -> UrlRepository m
 urlRepository ref =
   Repository
-    { save = \entity@Urls.Url {..} -> liftIO $ do
+    { save = \entity@Url {..} -> liftIO $ do
         db <- liftIO $ readIORef ref
         let newDb = Map.insert urlId entity db
         liftIO $ writeIORef ref newDb

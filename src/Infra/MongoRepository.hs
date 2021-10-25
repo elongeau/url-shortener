@@ -2,8 +2,7 @@
 
 module Infra.MongoRepository where
 
-import Core.Repository (Repository (Repository, findById, save), UrlRepository)
-import qualified Core.Urls as Urls
+import Core (Repository (Repository, findById, save), UrlRepository, Url(Url))
 import qualified Data.Text as T
 import Database.MongoDB (Action, Document, Field ((:=)), Pipe, Val (val), access, findOne, insert, master, select, (!?))
 import Infra.App (App)
@@ -21,13 +20,13 @@ mkUrlRepository pipe =
     collection = "urls"
     run :: Action IO a -> App a
     run act = liftIO $ access pipe master "url-shortener" act
-    save :: Urls.Url -> App Urls.Url
-    save url@(Urls.Url raw _id) = do
+    save :: Url -> App Url
+    save url@(Url raw _id) = do
       _ <- run $ insert collection ["url" := val raw, "_id" := val _id]
       pure url
-    findById :: T.Text -> App (Maybe Urls.Url)
+    findById :: T.Text -> App (Maybe Url)
     findById id = do
       maybeDoc <- run $ findOne $ select ["_id" := val id] collection
       return $ maybeDoc >>= mkUrl
-    mkUrl :: Document -> Maybe Urls.Url
-    mkUrl doc = Urls.Url <$> (doc !? "url") <*> (doc !? "_id")
+    mkUrl :: Document -> Maybe Url
+    mkUrl doc = Url <$> (doc !? "url") <*> (doc !? "_id")

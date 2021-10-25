@@ -14,8 +14,8 @@ import Control.Exception (catch, throwIO)
 import Control.Monad.Error.Class (MonadError (catchError, throwError))
 import Control.Monad.Except (MonadIO (liftIO))
 import Control.Monad.Reader (MonadReader, ReaderT (ReaderT, runReaderT))
-import Core.Error (AppError, AppException (AppException))
 import UnliftIO (MonadUnliftIO)
+import Core (AppException(..), AppError)
 
 newtype App a = App
   { unApp :: ReaderT AppEnv IO a
