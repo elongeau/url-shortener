@@ -3,3 +3,6 @@ db-start:
 
 db-stop:
 	docker compose -f mongo-stack.yml down
+
+run:
+	cabal run url-shortener
