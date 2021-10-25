@@ -21,3 +21,7 @@ newtype ShortenedUrl = ShortenedUrl
 instance FromJSON ShortenedUrl
 
 instance ToJSON ShortenedUrl
+
+newtype BaseUrl = BaseUrl
+  { base :: T.Text
+  }

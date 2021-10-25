@@ -1,6 +1,5 @@
 module ServerSpec where
 
-import qualified Infra as I
 import Core.Repository (Repository (Repository, findById, save), UrlRepository)
 import Core.TimeProvider (TimeProvider (TimeProvider))
 import qualified Core.Urls as Urls
@@ -12,16 +11,14 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.String (IsString (fromString))
 import qualified Data.Text as T
-import Endpoints.Model (RequestUrl (RequestUrl), ShortenedUrl (ShortenedUrl))
+import Endpoints.Model (BaseUrl (BaseUrl), RequestUrl (RequestUrl), ShortenedUrl (ShortenedUrl))
+import qualified Infra as I
 import Network.HTTP.Types (hContentType, methodPost)
 import Network.Wai.Test (SResponse)
 import Test.Hspec (Spec, before, describe, it, runIO)
 import Test.Hspec.Wai (ResponseMatcher (matchHeaders, matchStatus), WaiSession, get, request, shouldRespondWith, with, (<:>))
 import UnliftIO (MonadIO (liftIO))
 import UrlShortener (runServer)
-
-postJson :: (ToJSON a) => BS.ByteString -> a -> WaiSession st SResponse
-postJson path entity = request methodPost path [(hContentType, "application/json")] (encode entity)
 
 spec :: Spec
 spec = do
@@ -31,13 +28,16 @@ spec = do
   before (cleanDB db) . with (pure $ runServer env) $ do
     describe "Using the API" $ do
       it "creates a short URL and then redirect to original url" $ do
-        _ <- postJson "/shorten" (RequestUrl "http://example.com") `shouldRespondWith` (toMatcher (ShortenedUrl "1L9zO9O")) {matchStatus = 201}
+        _ <- postJson "/shorten" (RequestUrl "http://example.com") `shouldRespondWith` (toMatcher (ShortenedUrl "http://localhost:8080/1L9zO9O")) {matchStatus = 201}
         get "/1L9zO9O" `shouldRespondWith` 301 {matchHeaders = ["Location" <:> "http://example.com"]}
       it "responds Not-Found when short url is unknown" $ do
         get "/unknown" `shouldRespondWith` 404
       it "fails on existing ID" $ do
         _ <- postJson "/shorten" (RequestUrl "http://example.com")
         postJson "/shorten" (RequestUrl "http://example.com") `shouldRespondWith` 409
+
+postJson :: (ToJSON a) => BS.ByteString -> a -> WaiSession st SResponse
+postJson path entity = request methodPost path [(hContentType, "application/json")] (encode entity)
 
 toMatcher :: (ToJSON a) => a -> ResponseMatcher
 toMatcher = fromString . toString . encode
@@ -76,5 +76,6 @@ mkEnv db timeRef =
   I.Env
     { envPort = 8080,
       envUrlRepository = urlRepository db,
-      envTimeProvider = timeProvider timeRef
+      envTimeProvider = timeProvider timeRef,
+      envBaseUrl = BaseUrl "http://localhost:8080"
     }

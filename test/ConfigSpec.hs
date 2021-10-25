@@ -1,6 +1,5 @@
 module ConfigSpec where
 
-import qualified Data.Text as T
 import Infra (Config (Config), loadConfig)
 import System.Environment (setEnv)
 import Test.Hspec (Spec, before, describe, it, shouldBe)
@@ -14,11 +13,12 @@ spec = describe "loading configuration" $ do
         setEnv "MONGO_HOST" "127.0.0.1"
         setEnv "MONGO_USER" "user"
         setEnv "MONGO_PASSWORD" "pwd"
+        setEnv "BASE_URL" "https://shorten.li/"
         cfg <- loadConfig
-        cfg `shouldBe` Config 1234 "127.0.0.1" (T.pack "user") (T.pack "pwd")
+        cfg `shouldBe` Config 1234 "127.0.0.1" "user" "pwd" "https://shorten.li/"
       it "should use default values" $ do
         cfg <- loadConfig
-        cfg `shouldBe` Config 8080 "localhost" (T.pack "root") (T.pack "password")
+        cfg `shouldBe` Config 8080 "localhost" "root" "password" "http://localhost:8080"
 
 cleanEnv :: IO ()
 cleanEnv = do
@@ -26,3 +26,4 @@ cleanEnv = do
   setEnv "MONGO_HOST" ""
   setEnv "MONGO_USER" ""
   setEnv "MONGO_PASSWORD" ""
+  setEnv "BASE_URL" ""

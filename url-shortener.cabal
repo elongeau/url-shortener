@@ -47,6 +47,7 @@ library
     , mr-env
     , mongoDB
     , time
+    , http-types
   default-language: Haskell2010
 
 executable url-shortener
@@ -72,6 +73,7 @@ executable url-shortener
     , mr-env
     , mongoDB
     , time
+    , http-types
     , url-shortener
   default-language: Haskell2010
 
@@ -102,10 +104,10 @@ test-suite spec
     , mr-env
     , mongoDB
     , time
+    , http-types
     , url-shortener
     , hspec
     , hedgehog
-    , http-types
     , wai-extra
     , hspec-wai
     , hspec-wai-json

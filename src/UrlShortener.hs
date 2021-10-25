@@ -17,6 +17,7 @@ import Database.MongoDB.Connection (host)
 import qualified Infra as I
 import qualified Infra.App.Monad as I
 import Servant.API.Generic (toServant)
+import Endpoints.Model (BaseUrl(BaseUrl))
 
 
 runAsIO :: I.AppEnv -> I.App a -> IO (Either AppError a)
@@ -54,6 +55,7 @@ setup I.Config{..} = do
     getCurrentTimestamp = liftIO $ round . (* 1000)<$> getPOSIXTime
   }
   let envUrlRepository = I.mkUrlRepository pipe
+  let envBaseUrl = BaseUrl cfgBaseUrl
   pure I.Env{..}
 
 main :: IO ()

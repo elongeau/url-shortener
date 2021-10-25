@@ -18,6 +18,7 @@ dependencies:
   - mr-env
   - mongoDB
   - time
+  - http-types
 
 library:
   source-dirs: src
@@ -45,7 +46,6 @@ tests:
       - url-shortener
       - hspec
       - hedgehog
-      - http-types
       - wai-extra
       - hspec-wai
       - hspec-wai-json

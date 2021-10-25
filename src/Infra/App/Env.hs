@@ -8,11 +8,14 @@ import Control.Monad.Reader (MonadReader)
 import Core.Has (Has (obtain))
 import Core.Repository (UrlRepository)
 import Core.TimeProvider (TimeProvider)
+import Endpoints.Model (BaseUrl)
+
 
 data Env m = Env
   { envPort :: Int,
     envUrlRepository :: UrlRepository m,
-    envTimeProvider :: TimeProvider m
+    envTimeProvider :: TimeProvider m,
+    envBaseUrl :: BaseUrl
   }
 
 instance (MonadReader (Env m) m) => Has (UrlRepository m) (Env m) where
@@ -20,3 +23,6 @@ instance (MonadReader (Env m) m) => Has (UrlRepository m) (Env m) where
 
 instance (MonadReader (Env m) m) => Has (TimeProvider m) (Env m) where
   obtain = envTimeProvider
+
+instance (MonadReader (Env m) m) => Has BaseUrl (Env m) where
+  obtain = envBaseUrl
