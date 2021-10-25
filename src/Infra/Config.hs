@@ -1,4 +1,4 @@
-module Config (Config (..), loadConfig) where
+module Infra.Config (Config (..), loadConfig) where
 
 import qualified Data.Text as T
 import System.Environment.MrEnv (envAsInt, envAsString)

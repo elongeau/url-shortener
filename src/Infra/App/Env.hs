@@ -2,7 +2,7 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module App.Env (Env (..)) where
+module Infra.App.Env (Env (..)) where
 
 import Control.Monad.Reader (MonadReader)
 import Core.Has (Has (obtain))

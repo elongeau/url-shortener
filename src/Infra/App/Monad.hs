@@ -1,7 +1,7 @@
 {-# LANGUAGE ConstraintKinds #-}
 {-# LANGUAGE InstanceSigs #-}
 
-module App.Monad
+module Infra.App.Monad
   ( App (..),
     Env,
     AppEnv,
@@ -9,7 +9,7 @@ module App.Monad
   )
 where
 
-import App.Env (Env)
+import Infra.App.Env (Env)
 import Control.Exception (catch, throwIO)
 import Control.Monad.Error.Class (MonadError (catchError, throwError))
 import Control.Monad.Except (MonadIO (liftIO))

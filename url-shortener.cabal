@@ -1,21 +1,15 @@
-cabal-version: 1.12
-
--- This file has been generated from package.yaml by hpack version 0.34.4.
+-- This file has been generated from package.yaml by hpack version 0.17.0.
 --
 -- see: https://github.com/sol/hpack
 
+cabal-version:  >= 1.10
 name:           url-shortener
 version:        0.1.0.0
-license:        MIT
 license-file:   LICENSE
 build-type:     Simple
 
 library
   exposed-modules:
-      App
-      App.Env
-      App.Monad
-      Config
       Core.Error
       Core.Has
       Core.Repository
@@ -25,97 +19,60 @@ library
       Core.Urls.Service
       Endpoints.Model
       Endpoints.UrlAPI
-      Infra.Repositories
+      Infra
+      Infra.App
+      Infra.App.Env
+      Infra.App.Monad
+      Infra.Config
+      Infra.MongoRepository
       UrlShortener
-  other-modules:
-      Paths_url_shortener
   hs-source-dirs:
       src
-  default-extensions:
-      DataKinds
-      FlexibleContexts
-      GADTs
-      LambdaCase
-      PolyKinds
-      RankNTypes
-      ScopedTypeVariables
-      TypeApplications
-      TypeOperators
-      TypeFamilies
-      TemplateHaskell
-      MultiParamTypeClasses
-      GeneralizedNewtypeDeriving
-      DeriveGeneric
-      DerivingStrategies
-      OverloadedStrings
-      RecordWildCards
-      StrictData
-      PatternSynonyms
-      BlockArguments
+  default-extensions: DataKinds FlexibleContexts GADTs LambdaCase PolyKinds RankNTypes ScopedTypeVariables TypeApplications TypeOperators TypeFamilies TemplateHaskell MultiParamTypeClasses GeneralizedNewtypeDeriving DeriveGeneric DerivingStrategies OverloadedStrings RecordWildCards StrictData PatternSynonyms BlockArguments
   ghc-options: -Weverything -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missed-specialisations -Wno-all-missed-specialisations -Wno-unsafe -Wno-safe -Wno-missing-local-signatures -Wno-monomorphism-restriction -Wno-missing-export-lists -Wno-missing-home-modules -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unused-packages -Wno-implicit-prelude -O2 -flate-specialise -fspecialise-aggressively
   build-depends:
-      aeson
-    , base >=4.14 && <5
-    , bytestring
-    , deriving-aeson
-    , either
-    , mongoDB
-    , mr-env
+      base >= 4.14 && < 5
+    , text
     , mtl
+    , aeson
+    , deriving-aeson
     , servant
     , servant-server
-    , text
-    , time
-    , unliftio
     , wai
     , warp
+    , either
+    , time
+    , unliftio
+    , bytestring
+    , mr-env
+    , mongoDB
+    , time
   default-language: Haskell2010
 
 executable url-shortener
   main-is: Main.hs
-  other-modules:
-      Paths_url_shortener
   hs-source-dirs:
       app
-  default-extensions:
-      DataKinds
-      FlexibleContexts
-      GADTs
-      LambdaCase
-      PolyKinds
-      RankNTypes
-      ScopedTypeVariables
-      TypeApplications
-      TypeOperators
-      TypeFamilies
-      TemplateHaskell
-      MultiParamTypeClasses
-      GeneralizedNewtypeDeriving
-      DeriveGeneric
-      DerivingStrategies
-      OverloadedStrings
-      RecordWildCards
-      StrictData
-      PatternSynonyms
-      BlockArguments
+  default-extensions: DataKinds FlexibleContexts GADTs LambdaCase PolyKinds RankNTypes ScopedTypeVariables TypeApplications TypeOperators TypeFamilies TemplateHaskell MultiParamTypeClasses GeneralizedNewtypeDeriving DeriveGeneric DerivingStrategies OverloadedStrings RecordWildCards StrictData PatternSynonyms BlockArguments
   ghc-options: -Weverything -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missed-specialisations -Wno-all-missed-specialisations -Wno-unsafe -Wno-safe -Wno-missing-local-signatures -Wno-monomorphism-restriction -Wno-missing-export-lists -Wno-missing-home-modules -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unused-packages -Wno-implicit-prelude -O2 -flate-specialise -fspecialise-aggressively -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      aeson
-    , base >=4.14 && <5
-    , bytestring
-    , deriving-aeson
-    , either
-    , mongoDB
-    , mr-env
+      base >= 4.14 && < 5
+    , text
     , mtl
+    , aeson
+    , deriving-aeson
     , servant
     , servant-server
-    , text
-    , time
-    , unliftio
-    , url-shortener
     , wai
     , warp
+    , either
+    , time
+    , unliftio
+    , bytestring
+    , mr-env
+    , mongoDB
+    , time
+    , url-shortener
   default-language: Haskell2010
 
 test-suite spec
@@ -124,56 +81,36 @@ test-suite spec
   other-modules:
       ConfigSpec
       ServerSpec
-      Paths_url_shortener
   hs-source-dirs:
       test
-  default-extensions:
-      DataKinds
-      FlexibleContexts
-      GADTs
-      LambdaCase
-      PolyKinds
-      RankNTypes
-      ScopedTypeVariables
-      TypeApplications
-      TypeOperators
-      TypeFamilies
-      TemplateHaskell
-      MultiParamTypeClasses
-      GeneralizedNewtypeDeriving
-      DeriveGeneric
-      DerivingStrategies
-      OverloadedStrings
-      RecordWildCards
-      StrictData
-      PatternSynonyms
-      BlockArguments
+  default-extensions: DataKinds FlexibleContexts GADTs LambdaCase PolyKinds RankNTypes ScopedTypeVariables TypeApplications TypeOperators TypeFamilies TemplateHaskell MultiParamTypeClasses GeneralizedNewtypeDeriving DeriveGeneric DerivingStrategies OverloadedStrings RecordWildCards StrictData PatternSynonyms BlockArguments
   ghc-options: -Weverything -Wno-missing-exported-signatures -Wno-missing-import-lists -Wno-missed-specialisations -Wno-all-missed-specialisations -Wno-unsafe -Wno-safe -Wno-missing-local-signatures -Wno-monomorphism-restriction -Wno-missing-export-lists -Wno-missing-home-modules -Wno-missing-safe-haskell-mode -Wno-prepositive-qualified-module -Wno-unused-packages -Wno-implicit-prelude -O2 -flate-specialise -fspecialise-aggressively -threaded -rtsopts -with-rtsopts=-N
   build-depends:
-      aeson
-    , base >=4.14 && <5
-    , bytestring
-    , containers
-    , deriving-aeson
-    , either
-    , hedgehog
-    , hspec
-    , hspec-wai
-    , hspec-wai-json
-    , http-client
-    , http-types
-    , mongoDB
-    , mr-env
-    , mtl
-    , servant
-    , servant-client
-    , servant-server
+      base >= 4.14 && < 5
     , text
+    , mtl
+    , aeson
+    , deriving-aeson
+    , servant
+    , servant-server
+    , wai
+    , warp
+    , either
     , time
     , unliftio
+    , bytestring
+    , mr-env
+    , mongoDB
+    , time
     , url-shortener
-    , utf8-string
-    , wai
+    , hspec
+    , hedgehog
+    , http-types
     , wai-extra
-    , warp
+    , hspec-wai
+    , hspec-wai-json
+    , servant-client
+    , http-client
+    , utf8-string
+    , containers
   default-language: Haskell2010

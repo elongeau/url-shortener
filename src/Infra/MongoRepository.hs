@@ -1,12 +1,12 @@
 {-# OPTIONS_GHC -Wno-deferred-type-errors #-}
 
-module Infra.Repositories where
+module Infra.MongoRepository where
 
-import App (App)
 import Core.Repository (Repository (Repository, findById, save), UrlRepository)
 import qualified Core.Urls as Urls
 import qualified Data.Text as T
 import Database.MongoDB (Action, Document, Field ((:=)), Pipe, Val (val), access, findOne, insert, master, select, (!?))
+import Infra.App (App)
 import UnliftIO (MonadIO (liftIO))
 import Prelude hiding (id)
 

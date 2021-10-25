@@ -1,7 +1,7 @@
 module ConfigSpec where
 
-import Config (Config (Config), loadConfig)
 import qualified Data.Text as T
+import Infra (Config (Config), loadConfig)
 import System.Environment (setEnv)
 import Test.Hspec (Spec, before, describe, it, shouldBe)
 

@@ -38,7 +38,7 @@ type API = "shorten" :> ReqBody '[JSON] RequestUrl :> Created '[JSON] ShortenedU
   :<|> Capture "id" T.Text :> Redirect UrlForHeader
 
 shorten :: forall env m. (WithError m, WithTimeProvider env m, WithUrlRepository env m) => RequestUrl -> m ShortenedUrl
-shorten RequestUrl {..} = go 3
+shorten RequestUrl {..} = go 3 -- tries 3 times before giving up
   where 
     go :: Int -> m ShortenedUrl
     go 0 = throwError ConcurrentAccess

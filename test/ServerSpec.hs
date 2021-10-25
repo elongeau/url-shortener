@@ -1,7 +1,6 @@
 module ServerSpec where
 
-import App (Env (..))
-import App.Monad (AppEnv)
+import qualified Infra as I
 import Core.Repository (Repository (Repository, findById, save), UrlRepository)
 import Core.TimeProvider (TimeProvider (TimeProvider))
 import qualified Core.Urls as Urls
@@ -72,9 +71,9 @@ timeProvider ref =
 cleanDB :: IORef DB -> IO ()
 cleanDB ref = writeIORef ref Map.empty
 
-mkEnv :: IORef DB -> IORef Int -> AppEnv
+mkEnv :: IORef DB -> IORef Int -> I.AppEnv
 mkEnv db timeRef =
-  Env
+  I.Env
     { envPort = 8080,
       envUrlRepository = urlRepository db,
       envTimeProvider = timeProvider timeRef
