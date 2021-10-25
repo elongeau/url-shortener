@@ -7,7 +7,7 @@ import qualified Data.Text as T
 
 shortenUrl :: Int -> LongUrl -> Url
 shortenUrl timestamp LongUrl {..} =
-  let urlId = toBase62 timestamp
+  let urlId = toBase62 (timestamp + 100000000000)
    in Url
         { urlRaw = lgUrl,
           urlId = urlId

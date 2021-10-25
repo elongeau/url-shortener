@@ -26,8 +26,8 @@ spec = do
   before (cleanDB db) . with (pure $ runServer env) $ do
     describe "Using the API" $ do
       it "creates a short URL and then redirect to original url" $ do
-        _ <- postJson "/shorten" (RequestUrl "http://example.com") `shouldRespondWith` (toMatcher (ShortenedUrl "http://localhost:8080/1L9zO9O")) {matchStatus = 201}
-        get "/1L9zO9O" `shouldRespondWith` 301 {matchHeaders = ["Location" <:> "http://example.com"]}
+        _ <- postJson "/shorten" (RequestUrl "http://example.com") `shouldRespondWith` (toMatcher (ShortenedUrl "http://localhost:8080/3wj9CjC")) {matchStatus = 201}
+        get "/3wj9CjC" `shouldRespondWith` 301 {matchHeaders = ["Location" <:> "http://example.com"]}
       it "responds Not-Found when short url is unknown" $ do
         get "/unknown" `shouldRespondWith` 404
       it "fails on existing ID" $ do

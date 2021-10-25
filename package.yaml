@@ -46,6 +46,7 @@ tests:
       - url-shortener
       - hspec
       - hedgehog
+      - hspec-hedgehog
       - wai-extra
       - hspec-wai
       - hspec-wai-json
