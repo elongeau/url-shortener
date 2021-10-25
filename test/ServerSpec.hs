@@ -8,7 +8,7 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.String (IsString (fromString))
 import qualified Data.Text as T
-import Endpoints (BaseUrl (BaseUrl), RequestUrl (RequestUrl), ShortenedUrl (ShortenedUrl))
+import Handlers (BaseUrl (BaseUrl), RequestUrl (RequestUrl), ShortenedUrl (ShortenedUrl))
 import Network.HTTP.Types (hContentType, methodPost)
 import Network.Wai.Test (SResponse)
 import Test.Hspec (Spec, before, describe, it, runIO)

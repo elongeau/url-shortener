@@ -4,9 +4,9 @@
 {-# LANGUAGE KindSignatures #-}
 {-# LANGUAGE TypeOperators #-}
 
-module Endpoints.UrlAPI (UrlRoutes(..), shorten, redirect) where
+module Handlers.UrlAPI (UrlRoutes(..), shorten, redirect) where
 
-import Endpoints.Model (RequestUrl (RequestUrl, raw), ShortenedUrl (ShortenedUrl), BaseUrl(..))
+import Handlers.Model (RequestUrl (RequestUrl, raw), ShortenedUrl (ShortenedUrl), BaseUrl(..))
 import Servant
     ( addHeader,
       ToHttpApiData(..),

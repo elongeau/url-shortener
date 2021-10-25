@@ -1,4 +1,4 @@
-module Endpoints.Model where
+module Handlers.Model where
 
 import Data.Aeson (FromJSON, ToJSON)
 import qualified Data.Text as T

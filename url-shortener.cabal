@@ -18,9 +18,9 @@ library
       Core.Urls
       Core.Urls.Model
       Core.Urls.Service
-      Endpoints
-      Endpoints.Model
-      Endpoints.UrlAPI
+      Handlers
+      Handlers.Model
+      Handlers.UrlAPI
       Infra
       Infra.App
       Infra.App.Env

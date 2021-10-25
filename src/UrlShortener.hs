@@ -14,7 +14,7 @@ import Database.MongoDB.Connection (host)
 import Servant.API.Generic (toServant)
 import Core (AppError(AppError), AppErrorType (NotFound, ConcurrentAccess), TimeProvider(..), AppException (unAppException))
 import Infra (API, routes, AppEnv, App, Env(..), Config(..),runApp, mkUrlRepository, loadConfig)
-import Endpoints (BaseUrl(BaseUrl))
+import Handlers (BaseUrl(BaseUrl))
 
 
 runAsIO :: AppEnv -> App a -> IO (Either AppError a)

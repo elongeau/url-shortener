@@ -6,7 +6,7 @@ module Infra.App.Env (Env (..)) where
 
 import Control.Monad.Reader (MonadReader)
 import Core (UrlRepository, TimeProvider, Has (obtain))
-import Endpoints (BaseUrl)
+import Handlers (BaseUrl)
 
 
 data Env m = Env
