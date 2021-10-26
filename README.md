@@ -14,6 +14,7 @@ You need docker to start the MongoDB used by the application, use the `Makefile`
 
 - `db-start`/`db-stop` to start/stop the local MongoDB
 - `run` to start the application
+- `test` to build and test the application
 
 # Interacting with the application
 
