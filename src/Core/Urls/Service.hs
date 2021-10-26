@@ -5,6 +5,7 @@ module Core.Urls.Service (shortenUrl) where
 import Core.Urls.Model (LongUrl (..), Url (..))
 import qualified Data.Text as T
 
+-- | generate the URL ID
 shortenUrl :: Int -> LongUrl -> Url
 shortenUrl timestamp LongUrl {..} =
   let urlId = toBase62 (timestamp + 100000000000)
