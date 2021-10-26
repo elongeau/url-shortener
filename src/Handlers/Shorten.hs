@@ -10,14 +10,15 @@ import qualified Data.Text as T
 import Core (WithError, WithTimeProvider, WithUrlRepository, Has, UrlRepository, TimeProvider (getCurrentTimestamp), Url(..), grab, Repository (findById, save), throwError, AppErrorType (ConcurrentAccess), shortenUrl, LongUrl(..), WithLogger, logInfo, logError)
 
 shorten :: forall env m. (WithLogger env m, WithError m, WithTimeProvider env m, WithUrlRepository env m, Has BaseUrl env) => RequestUrl -> m ShortenedUrl
-shorten RequestUrl {..} = go 3 -- tries 3 times before giving up
+shorten RequestUrl {..} = go maxTries -- tries `maxTries` times before giving up
   where 
+    maxTries = 3
     go :: Int -> m ShortenedUrl
-    go 0 = do
+    go x | x < 1 = do
       logError $ "Fail to shorten '" <> raw <> "'"
       throwError ConcurrentAccess
     go n = do
-      logInfo $ "Try #" <> T.pack (show n) <> ": Shorten url '" <> raw <> "'"
+      logInfo $ "Try #" <> counter (n - maxTries) <> ": Shorten url '" <> raw <> "'"
       save' <- save <$> grab @(UrlRepository m)
       findById' <- findById <$> grab @(UrlRepository m)
       baseUrl <- base <$> grab @BaseUrl
@@ -29,3 +30,5 @@ shorten RequestUrl {..} = go 3 -- tries 3 times before giving up
           _ <- save' url
           pure $ ShortenedUrl $ baseUrl <> "/" <> urlId 
         Just _ -> go $ n - 1
+    counter = T.pack . show . (+ 1) . abs
+
