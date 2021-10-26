@@ -8,7 +8,7 @@ data Config = Config
     cfgMongoHost :: String,
     cfgMongoUser :: T.Text,
     cfgMongoPassword :: T.Text,
-    cfgBaseUrl :: T.Text
+    cfgHostUrl :: T.Text
   }
   deriving stock (Show, Eq)
 
@@ -18,5 +18,5 @@ loadConfig = do
   cfgMongoHost <- envAsString "MONGO_HOST" "localhost"
   cfgMongoUser <- T.pack <$> envAsString "MONGO_USER" "root"
   cfgMongoPassword <- T.pack <$> envAsString "MONGO_PASSWORD" "password"
-  cfgBaseUrl <- T.pack <$> envAsString "BASE_URL" "http://localhost:8080"
+  cfgHostUrl <- T.pack <$> envAsString "BASE_URL" "http://localhost:8080"
   pure Config {..}

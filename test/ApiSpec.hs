@@ -1,5 +1,6 @@
 module ApiSpec where
 
+import Core (Logger (..), Repository (Repository, findById, save), TimeProvider (..), Url (Url, urlId), UrlRepository)
 import Data.Aeson (ToJSON, encode)
 import qualified Data.ByteString as BS
 import Data.ByteString.Lazy.UTF8 (toString)
@@ -8,15 +9,14 @@ import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.String (IsString (fromString))
 import qualified Data.Text as T
-import Handlers (BaseUrl (BaseUrl), RequestUrl (RequestUrl), ShortenedUrl (ShortenedUrl))
+import Handlers (HostUrl (HostUrl), RequestUrl (RequestUrl), ShortenedUrl (ShortenedUrl))
+import Infra (AppEnv, Env (..))
 import Network.HTTP.Types (hContentType, methodPost)
 import Network.Wai.Test (SResponse)
 import Test.Hspec (Spec, before, describe, it, runIO)
 import Test.Hspec.Wai (ResponseMatcher (matchHeaders, matchStatus), WaiSession, get, request, shouldRespondWith, with, (<:>))
 import UnliftIO (MonadIO (liftIO))
 import UrlShortener (runAsApplication)
-import Core (Url(Url, urlId), UrlRepository,Repository(Repository, save, findById), TimeProvider(..), Logger(..))
-import Infra (AppEnv, Env(..))
 
 spec :: Spec
 spec = do
@@ -76,7 +76,7 @@ mkEnv db timeRef =
       envUrlRepository = urlRepository db,
       envTimeProvider = timeProvider timeRef,
       envLogger = noLogging,
-      envBaseUrl = BaseUrl "http://localhost:8080"
+      envHostUrl = HostUrl "http://localhost:8080"
     }
-  where 
-    noLogging =  Logger $ \_ _ -> pure ()
+  where
+    noLogging = Logger $ \_ _ -> pure ()

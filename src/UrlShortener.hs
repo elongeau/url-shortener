@@ -14,7 +14,7 @@ import Database.MongoDB.Connection (host)
 import Servant.API.Generic (toServant)
 import Core (AppError(AppError), AppErrorType (NotFound, ConcurrentAccess), TimeProvider(..), AppException (unAppException))
 import Infra (API, routes, AppEnv, App, Env(..), Config(..),runApp, mkUrlRepository, loadConfig, consoleLogger)
-import Handlers (BaseUrl(BaseUrl))
+import Handlers (HostUrl(HostUrl))
 
 -- | entry point for the application
 main :: IO ()
@@ -33,7 +33,7 @@ setup Config{..} = do
     getCurrentTimestamp = liftIO $ round . (* 1000)<$> getPOSIXTime
   }
   let envUrlRepository = mkUrlRepository pipe
-  let envBaseUrl = BaseUrl cfgBaseUrl
+  let envHostUrl = HostUrl cfgHostUrl
   envLogger <- consoleLogger  
   pure Env{..}
 

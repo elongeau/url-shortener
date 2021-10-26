@@ -4,6 +4,7 @@ import Data.Aeson (FromJSON, ToJSON)
 import qualified Data.Text as T
 import GHC.Generics (Generic)
 
+-- | A URL to shorten
 newtype RequestUrl = RequestUrl
   { raw :: T.Text
   }
@@ -13,6 +14,7 @@ instance FromJSON RequestUrl
 
 instance ToJSON RequestUrl
 
+-- | The shortened URL
 newtype ShortenedUrl = ShortenedUrl
   { url :: T.Text
   }
@@ -22,6 +24,7 @@ instance FromJSON ShortenedUrl
 
 instance ToJSON ShortenedUrl
 
-newtype BaseUrl = BaseUrl
+-- | the Host URL
+newtype HostUrl = HostUrl
   { base :: T.Text
   }
