@@ -6,6 +6,7 @@ import qualified Hedgehog.Gen as Gen
 import qualified Hedgehog.Range as Range
 import Test.Hspec (Spec, describe, it)
 import Test.Hspec.Hedgehog (forAll, hedgehog, (===))
+import Data.Char (isAlphaNum)
 
 spec :: Spec
 spec = describe "encoding an URL" $ do
@@ -19,3 +20,8 @@ spec = describe "encoding an URL" $ do
       url <- forAll $ Gen.text (Range.linear 20 50) Gen.alpha
       let result = urlRaw $ shortenUrl 0 (LongUrl url)
       result === url
+  it "use only characters from base62" $
+    hedgehog $ do
+      (x :: Int) <- forAll $ Gen.integral (Range.exponential 0 200000000000)
+      let f = T.unpack . urlId . flip shortenUrl (LongUrl "")
+      all isAlphaNum (f x) === True 
