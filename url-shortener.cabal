@@ -130,9 +130,9 @@ test-suite spec
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      ConfigSpec
+      ApiSpec
       Core.Urls.ServiceSpec
-      ServerSpec
+      Infra.ConfigSpec
       Paths_url_shortener
   hs-source-dirs:
       test

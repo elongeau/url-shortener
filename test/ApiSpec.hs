@@ -1,4 +1,4 @@
-module ServerSpec where
+module ApiSpec where
 
 import Data.Aeson (ToJSON, encode)
 import qualified Data.ByteString as BS

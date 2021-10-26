@@ -1,4 +1,4 @@
-module ConfigSpec where
+module Infra.ConfigSpec where
 
 import Infra (Config (Config), loadConfig)
 import System.Environment (setEnv)
