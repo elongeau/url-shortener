@@ -1,7 +1,9 @@
 module Handlers (
   module Handlers.Model,
-  module Handlers.UrlAPI
+  module Handlers.Shorten,
+  module Handlers.Redirect,
 )where
 
 import Handlers.Model
-import Handlers.UrlAPI
+import Handlers.Shorten
+import Handlers.Redirect

@@ -23,7 +23,8 @@ library
       Core.Urls.Service
       Handlers
       Handlers.Model
-      Handlers.UrlAPI
+      Handlers.Redirect
+      Handlers.Shorten
       Infra
       Infra.App
       Infra.App.Env
