@@ -12,9 +12,12 @@ import Control.Monad.Error.Class (liftEither)
 import Database.MongoDB (connect, access, master, auth)
 import Database.MongoDB.Connection (host)
 import Servant.API.Generic (toServant)
-import Core (AppError(AppError), AppErrorType (NotFound, ConcurrentAccess), TimeProvider(..), AppException (unAppException))
+import Core (AppError(AppError), AppErrorType (NotFound, ConcurrentAccess), TimeProvider(..), AppException (unAppException), Logger(..))
 import Infra (API, routes, AppEnv, App, Env(..), Config(..),runApp, mkUrlRepository, loadConfig)
 import Handlers (BaseUrl(BaseUrl))
+import qualified Data.Text as T
+import Data.Time.Clock
+import Data.Time.Format.ISO8601 (iso8601Show)
 
 
 runAsIO :: AppEnv -> App a -> IO (Either AppError a)
@@ -51,12 +54,19 @@ setup Config{..} = do
     getCurrentTimestamp = liftIO $ round . (* 1000)<$> getPOSIXTime
   }
   let envUrlRepository = mkUrlRepository pipe
+  envLogger <- logger  
   let envBaseUrl = BaseUrl cfgBaseUrl
   pure Env{..}
+
+logger :: IO (Logger App)
+logger = do
+  pure $ Logger $ \sev msg -> do
+    currentTime <- liftIO getCurrentTime
+    liftIO $ putStrLn $ "[" <> iso8601Show currentTime <> "] [" <> show sev <> "] " <> T.unpack msg
+
 
 main :: IO ()
 main = do
   conf <- loadConfig
   env <- setup conf
-  putStrLn "Starting Url-Shortener app"
   runIO env

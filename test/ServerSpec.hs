@@ -15,7 +15,7 @@ import Test.Hspec (Spec, before, describe, it, runIO)
 import Test.Hspec.Wai (ResponseMatcher (matchHeaders, matchStatus), WaiSession, get, request, shouldRespondWith, with, (<:>))
 import UnliftIO (MonadIO (liftIO))
 import UrlShortener (runServer)
-import Core (Url(Url, urlId), UrlRepository,Repository(Repository, save, findById), TimeProvider(..))
+import Core (Url(Url, urlId), UrlRepository,Repository(Repository, save, findById), TimeProvider(..), Logger(..))
 import Infra (AppEnv, Env(..))
 
 spec :: Spec
@@ -75,5 +75,8 @@ mkEnv db timeRef =
     { envPort = 8080,
       envUrlRepository = urlRepository db,
       envTimeProvider = timeProvider timeRef,
+      envLogger = noLogging,
       envBaseUrl = BaseUrl "http://localhost:8080"
     }
+  where 
+    noLogging =  Logger $ \_ _ -> pure ()

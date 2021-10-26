@@ -15,6 +15,7 @@ library
       Core
       Core.Error
       Core.Has
+      Core.Logger
       Core.Repository
       Core.TimeProvider
       Core.Urls

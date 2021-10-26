@@ -10,9 +10,7 @@ import Servant
     NoContent (..),
     ReqBody,
     StdMethod (GET, POST),
-    ToHttpApiData (..),
     Verb,
-    addHeader,
     type (:>),
   )
 import Servant.API.Generic (ToServantApi, type (:-))
