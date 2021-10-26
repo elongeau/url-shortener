@@ -25,6 +25,7 @@ data AppErrorType
   | ConcurrentAccess
   deriving stock (Show, Eq)
 
+-- | Indicate that the function can throw 'AppError'
 type WithError m = MonadError AppError m
 
 -- | Specialized version of 'E.throwError'.

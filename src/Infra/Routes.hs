@@ -1,4 +1,4 @@
-module Infra.Routes where
+module Infra.Routes (routes,API) where
 
 import Handlers (redirect, shorten, RequestUrl, ShortenedUrl, UrlForHeader)
 import Infra.App.Monad (App)
@@ -20,18 +20,22 @@ import GHC.Generics (Generic)
 
 type API = ToServantApi UrlRoutes
 
-type AppServer = AsServerT App
-
+-- | Describe a 'Created' status code
 type Created = Verb 'POST 201
 
+-- | Describe a 'Redirect' status code with Location header
 type Redirect loc = Verb 'GET 301 '[JSON] (Headers '[Header "Location" loc] NoContent)
 
+-- | Define the routes of the application
 data UrlRoutes route = UrlRoutes
   { _shorten :: route :- "shorten" :> ReqBody '[JSON] RequestUrl :> Created '[JSON] ShortenedUrl,
     _redirect :: route :- Capture "id" T.Text :> Redirect UrlForHeader
   }
   deriving stock (Generic)
 
+type AppServer = AsServerT App
+
+-- | bind routes and handlers
 routes :: UrlRoutes AppServer
 routes =
   UrlRoutes

@@ -9,6 +9,7 @@ import Handlers.Model (RequestUrl (RequestUrl, raw), ShortenedUrl (ShortenedUrl)
 import qualified Data.Text as T
 import Core (WithError, WithTimeProvider, WithUrlRepository, Has, UrlRepository, TimeProvider (getCurrentTimestamp), Url(..), grab, Repository (findById, save), throwError, AppErrorType (ConcurrentAccess), shortenUrl, LongUrl(..), WithLogger, logInfo, logError)
 
+-- | Handler to shorten an URL
 shorten :: forall env m. (WithLogger env m, WithError m, WithTimeProvider env m, WithUrlRepository env m, Has BaseUrl env) => RequestUrl -> m ShortenedUrl
 shorten RequestUrl {..} = go maxTries -- tries `maxTries` times before giving up
   where 

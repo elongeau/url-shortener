@@ -30,6 +30,7 @@ library
       Infra.App.Env
       Infra.App.Monad
       Infra.Config
+      Infra.ConsoleLogger
       Infra.MongoRepository
       Infra.Routes
       UrlShortener

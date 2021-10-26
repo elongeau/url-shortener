@@ -14,7 +14,7 @@ import Network.Wai.Test (SResponse)
 import Test.Hspec (Spec, before, describe, it, runIO)
 import Test.Hspec.Wai (ResponseMatcher (matchHeaders, matchStatus), WaiSession, get, request, shouldRespondWith, with, (<:>))
 import UnliftIO (MonadIO (liftIO))
-import UrlShortener (runServer)
+import UrlShortener (runAsApplication)
 import Core (Url(Url, urlId), UrlRepository,Repository(Repository, save, findById), TimeProvider(..), Logger(..))
 import Infra (AppEnv, Env(..))
 
@@ -23,7 +23,7 @@ spec = do
   db <- runIO ioDb
   timeRef <- runIO ioTimeRef
   let env = mkEnv db timeRef
-  before (cleanDB db) . with (pure $ runServer env) $ do
+  before (cleanDB db) . with (pure $ runAsApplication env) $ do
     describe "Using the API" $ do
       it "creates a short URL and then redirect to original url" $ do
         _ <- postJson "/shorten" (RequestUrl "http://example.com") `shouldRespondWith` (toMatcher (ShortenedUrl "http://localhost:8080/3wj9CjC")) {matchStatus = 201}

@@ -1,4 +1,4 @@
-module UrlShortener (main, runServer,runIO) where
+module UrlShortener (main, runAsApplication) where
 
 import Control.Monad.Reader (MonadIO (liftIO))
 import Network.Wai.Handler.Warp (run)
@@ -12,39 +12,18 @@ import Control.Monad.Error.Class (liftEither)
 import Database.MongoDB (connect, access, master, auth)
 import Database.MongoDB.Connection (host)
 import Servant.API.Generic (toServant)
-import Core (AppError(AppError), AppErrorType (NotFound, ConcurrentAccess), TimeProvider(..), AppException (unAppException), Logger(..))
-import Infra (API, routes, AppEnv, App, Env(..), Config(..),runApp, mkUrlRepository, loadConfig)
+import Core (AppError(AppError), AppErrorType (NotFound, ConcurrentAccess), TimeProvider(..), AppException (unAppException))
+import Infra (API, routes, AppEnv, App, Env(..), Config(..),runApp, mkUrlRepository, loadConfig, consoleLogger)
 import Handlers (BaseUrl(BaseUrl))
-import qualified Data.Text as T
-import Data.Time.Clock
-import Data.Time.Format.ISO8601 (iso8601Show)
 
+-- | entry point for the application
+main :: IO ()
+main = do
+  conf <- loadConfig
+  env <- setup conf
+  runAsIO env
 
-runAsIO :: AppEnv -> App a -> IO (Either AppError a)
-runAsIO env app = do 
-  x <- try $ runApp env app
-  let y = mapLeft unAppException  x
-  return y
-
-
-runAsHandler :: forall a. AppEnv -> App a -> Handler a
-runAsHandler env app = do 
-  res <- liftIO $ runAsIO env app
-  liftEither $ first toHttpError res
-
-toHttpError :: AppError -> ServerError
-toHttpError (AppError NotFound) = err404
-toHttpError (AppError ConcurrentAccess) = err409
-
-server :: AppEnv -> Server API
-server env = hoistServer (Proxy @API) (runAsHandler env) (toServant routes)
-
-runServer :: AppEnv -> Application
-runServer env = serve (Proxy @API) $ server env
-
-runIO :: AppEnv -> IO ()
-runIO env@Env{..} = run envPort $ runServer env
-
+-- | Setup everything necessary for 'Env'
 setup :: Config -> IO AppEnv 
 setup Config{..} = do 
   pipe <- liftIO $ connect (host cfgMongoHost)
@@ -54,19 +33,30 @@ setup Config{..} = do
     getCurrentTimestamp = liftIO $ round . (* 1000)<$> getPOSIXTime
   }
   let envUrlRepository = mkUrlRepository pipe
-  envLogger <- logger  
   let envBaseUrl = BaseUrl cfgBaseUrl
+  envLogger <- consoleLogger  
   pure Env{..}
 
-logger :: IO (Logger App)
-logger = do
-  pure $ Logger $ \sev msg -> do
-    currentTime <- liftIO getCurrentTime
-    liftIO $ putStrLn $ "[" <> iso8601Show currentTime <> "] [" <> show sev <> "] " <> T.unpack msg
+runAsIO :: AppEnv -> IO ()
+runAsIO env@Env{..} = run envPort $ runAsApplication env
 
+runAsApplication :: AppEnv -> Application
+runAsApplication env = serve (Proxy @API) $ runAsServer env
 
-main :: IO ()
-main = do
-  conf <- loadConfig
-  env <- setup conf
-  runIO env
+runAsServer :: AppEnv -> Server API
+runAsServer env = hoistServer (Proxy @API) (runAsHandler env) (toServant routes)
+
+runAsHandler :: forall a. AppEnv -> App a -> Handler a
+runAsHandler env app = do 
+  res <- liftIO $ runAsEitherIO env app
+  liftEither $ first toHttpError res
+
+runAsEitherIO :: AppEnv -> App a -> IO (Either AppError a)
+runAsEitherIO env app = do 
+  x <- try $ runApp env app
+  pure $ mapLeft unAppException  x
+
+-- | convert a business error to an HTTP status code
+toHttpError :: AppError -> ServerError
+toHttpError (AppError NotFound) = err404
+toHttpError (AppError ConcurrentAccess) = err409

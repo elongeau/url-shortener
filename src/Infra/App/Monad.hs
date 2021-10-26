@@ -9,14 +9,15 @@ module Infra.App.Monad
   )
 where
 
-import Infra.App.Env (Env)
 import Control.Exception (catch, throwIO)
 import Control.Monad.Error.Class (MonadError (catchError, throwError))
 import Control.Monad.Except (MonadIO (liftIO))
 import Control.Monad.Reader (MonadReader, ReaderT (ReaderT, runReaderT))
+import Core (AppError, AppException (..))
+import Infra.App.Env (Env)
 import UnliftIO (MonadUnliftIO)
-import Core (AppException(..), AppError)
 
+-- | The main Monad
 newtype App a = App
   { unApp :: ReaderT AppEnv IO a
   }
@@ -24,6 +25,7 @@ newtype App a = App
 
 type AppEnv = Env App
 
+-- | To allow to throw and catch an error
 instance MonadError AppError App where
   throwError :: AppError -> App a
   throwError = liftIO . throwIO . AppException

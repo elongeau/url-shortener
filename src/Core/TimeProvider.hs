@@ -10,4 +10,5 @@ newtype TimeProvider m = TimeProvider
   { getCurrentTimestamp :: m Int
   }
 
+-- | Indicate that the function can use a 'TimeProvider'
 type WithTimeProvider env m = (MonadReader env m, Has (TimeProvider m) env)
