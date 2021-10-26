@@ -5,4 +5,8 @@ db-stop:
 	docker compose -f mongo-stack.yml down
 
 run:
-	cabal run url-shortener
+	@stack --no-nix run
+
+.PHONY: test
+test: 
+	@stack --no-nix test --file-watch
