@@ -11,7 +11,9 @@ import Core (WithError, WithTimeProvider, WithUrlRepository, Has, UrlRepository,
 
 -- | Handler to shorten an URL
 shorten :: forall env m. (WithLogger env m, WithError m, WithTimeProvider env m, WithUrlRepository env m, Has HostUrl env) => RequestUrl -> m ShortenedUrl
-shorten req | isInvalid req = throwError NotAnUrl
+shorten req | isInvalid req = do
+  logError "The submitted url is invalid"
+  throwError NotAnUrl
 shorten RequestUrl{..} = go maxTries -- tries `maxTries` times before giving up
   where 
     maxTries = 3
