@@ -23,6 +23,7 @@ newtype AppError = AppError
 data AppErrorType
   = NotFound
   | ConcurrentAccess
+  | NotAnUrl
   deriving stock (Show, Eq)
 
 -- | Indicate that the function can throw 'AppError'

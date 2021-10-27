@@ -7,11 +7,12 @@ module Handlers.Shorten ( shorten) where
 
 import Handlers.Model (RequestUrl (RequestUrl, raw), ShortenedUrl (ShortenedUrl), HostUrl(..))
 import qualified Data.Text as T
-import Core (WithError, WithTimeProvider, WithUrlRepository, Has, UrlRepository, TimeProvider (getCurrentTimestamp), Url(..), grab, Repository (findById, save), throwError, AppErrorType (ConcurrentAccess), shortenUrl, LongUrl(..), WithLogger, logInfo, logError)
+import Core (WithError, WithTimeProvider, WithUrlRepository, Has, UrlRepository, TimeProvider (getCurrentTimestamp), Url(..), grab, Repository (findById, save), throwError, AppErrorType (ConcurrentAccess, NotAnUrl), shortenUrl, LongUrl(..), WithLogger, logInfo, logError)
 
 -- | Handler to shorten an URL
 shorten :: forall env m. (WithLogger env m, WithError m, WithTimeProvider env m, WithUrlRepository env m, Has HostUrl env) => RequestUrl -> m ShortenedUrl
-shorten RequestUrl {..} = go maxTries -- tries `maxTries` times before giving up
+shorten req | isInvalid req = throwError NotAnUrl
+shorten RequestUrl{..} = go maxTries -- tries `maxTries` times before giving up
   where 
     maxTries = 3
     go :: Int -> m ShortenedUrl
@@ -33,3 +34,5 @@ shorten RequestUrl {..} = go maxTries -- tries `maxTries` times before giving up
         Just _ -> go $ n - 1
     counter = T.pack . show . (+ 1) . abs
 
+isInvalid :: RequestUrl -> Bool 
+isInvalid RequestUrl{..} = not $ T.isPrefixOf "http" raw

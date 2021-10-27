@@ -2,7 +2,7 @@ module UrlShortener (main, runAsApplication) where
 
 import Control.Monad.Reader (MonadIO (liftIO))
 import Network.Wai.Handler.Warp (run)
-import Servant (Application, Handler, Proxy (Proxy), hoistServer, ServerError, err404, err409)
+import Servant (Application, Handler, Proxy (Proxy), hoistServer, ServerError (errBody), err404, err409, err400)
 import Servant.Server (Server, serve)
 import Data.Time.Clock.POSIX (getPOSIXTime)
 import Control.Exception (try)
@@ -12,7 +12,7 @@ import Control.Monad.Error.Class (liftEither)
 import Database.MongoDB (connect, access, master, auth)
 import Database.MongoDB.Connection (host)
 import Servant.API.Generic (toServant)
-import Core (AppError(AppError), AppErrorType (NotFound, ConcurrentAccess), TimeProvider(..), AppException (unAppException))
+import Core (AppError(AppError), AppErrorType (NotFound, ConcurrentAccess, NotAnUrl), TimeProvider(..), AppException (unAppException))
 import Infra (API, routes, AppEnv, App, Env(..), Config(..),runApp, mkUrlRepository, loadConfig, consoleLogger)
 import Handlers (HostUrl(HostUrl))
 
@@ -60,3 +60,4 @@ runAsEitherIO env app = do
 toHttpError :: AppError -> ServerError
 toHttpError (AppError NotFound) = err404
 toHttpError (AppError ConcurrentAccess) = err409
+toHttpError (AppError NotAnUrl) = err400 { errBody = "The submitted url is not a valid url" } 

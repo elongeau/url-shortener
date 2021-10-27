@@ -33,6 +33,8 @@ spec = do
       it "fails on existing ID" $ do
         _ <- postJson "/shorten" (RequestUrl "http://example.com")
         postJson "/shorten" (RequestUrl "http://example.com") `shouldRespondWith` 409
+      it "refuses invalid URL" $ do
+        postJson "/shorten" (RequestUrl "not-an-url") `shouldRespondWith` "The submitted url is not a valid url" { matchStatus = 400 }
 
 postJson :: (ToJSON a) => BS.ByteString -> a -> WaiSession st SResponse
 postJson path entity = request methodPost path [(hContentType, "application/json")] (encode entity)
