@@ -9,7 +9,8 @@ I used the blogpost [System Design : Scalable URL shortener service like TinyURL
 
 # Running the application
 
-The configuration is loaded from environment variables, see the `.envrc` for the details (don't forget to [`direnv allow .`](https://direnv.net/))
+The configuration is loaded from environment variables, see the `.envrc` for the details (don't forget to [`direnv allow .`](https://direnv.net/)).
+
 You need docker to start the MongoDB used by the application, use the `Makefile`:
 
 - `db-start`/`db-stop` to start/stop the local MongoDB
