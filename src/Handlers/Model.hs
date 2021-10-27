@@ -26,5 +26,5 @@ instance ToJSON ShortenedUrl
 
 -- | the Host URL
 newtype HostUrl = HostUrl
-  { base :: T.Text
+  { hUrl :: T.Text
   }

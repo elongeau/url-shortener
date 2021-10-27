@@ -25,7 +25,7 @@ shorten RequestUrl{..} = go maxTries -- tries `maxTries` times before giving up
       logInfo $ "Try #" <> counter (n - maxTries) <> ": Shorten url '" <> raw <> "'"
       save' <- save <$> grab @(UrlRepository m)
       findById' <- findById <$> grab @(UrlRepository m)
-      hostUrl <- base <$> grab @HostUrl
+      hostUrl <- hUrl <$> grab @HostUrl
       timestamp <- grab @(TimeProvider m) >>= getCurrentTimestamp
       let url@Url{..} = shortenUrl timestamp $ LongUrl raw
       maybeAlreadyExists <- findById' urlId
