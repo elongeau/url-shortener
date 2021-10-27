@@ -1,4 +1,4 @@
-# URL Shortener
+# URL Shortener
 
 Coding environment is provided by [nixkell](https://github.com/pwm/nixkell).
 The project [issue-wanted](https://github.com/kowainik/issue-wanted) was a great source of inspiration and also the post [Three layer Haskell cake](https://www.parsonsmatt.org/2018/03/22/three_layer_haskell_cake.html) by Matt Parsons.
