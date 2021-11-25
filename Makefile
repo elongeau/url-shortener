@@ -1,8 +1,5 @@
-db-start:
+mongo:
 	docker compose -f mongo-stack.yml up -d
-
-db-stop:
-	docker compose -f mongo-stack.yml down
 
 run:
 	@stack --no-nix run
