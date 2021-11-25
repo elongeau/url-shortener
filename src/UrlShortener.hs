@@ -1,4 +1,4 @@
-module UrlShortener (main, runAsApplication) where
+module UrlShortener (main, runAsApplication, mkAppEnv) where
 
 import Control.Monad.Reader (MonadIO (liftIO))
 import Network.Wai.Handler.Warp (run)
@@ -20,12 +20,12 @@ import Handlers (HostUrl(HostUrl))
 main :: IO ()
 main = do
   conf <- loadConfig
-  env <- setup conf
+  env <- mkAppEnv conf
   runAsIO env
 
 -- | Setup everything necessary for 'Env'
-setup :: Config -> IO AppEnv 
-setup Config{..} = do 
+mkAppEnv :: Config -> IO AppEnv 
+mkAppEnv Config{..} = do 
   pipe <- liftIO $ connect (host cfgMongoHost)
   _ <- liftIO $ access pipe master "admin" $ auth cfgMongoUser cfgMongoPassword
   let envPort = cfgPort
