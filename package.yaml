@@ -19,6 +19,7 @@ dependencies:
   - mongoDB
   - time
   - http-types
+  - autoexporter
 
 library:
   source-dirs: src
