@@ -1,5 +1,3 @@
-{-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE UndecidableInstances #-}
 {-# LANGUAGE DataKinds #-}
 {-# LANGUAGE KindSignatures #-}
 
@@ -7,10 +5,10 @@ module Handlers.Shorten ( shorten) where
 
 import Handlers.Model (RequestUrl (RequestUrl, raw), ShortenedUrl (ShortenedUrl), HostUrl(..))
 import qualified Data.Text as T
-import Core (WithError, WithTimeProvider, WithUrlRepository, Has, UrlRepository, TimeProvider (getCurrentTimestamp), Url(..), grab, Repository (findById, save), throwError, AppErrorType (ConcurrentAccess, NotAnUrl), shortenUrl, LongUrl(..), WithLogger, logInfo, logError)
+import Core (WithError, WithUrlRepository, Has, UrlRepository, Url(..), grab, Repository (findById, save), throwError, AppErrorType (ConcurrentAccess, NotAnUrl), WithLogger, logInfo, logError, genId)
 
 -- | Handler to shorten an URL
-shorten :: forall env m. (WithLogger env m, WithError m, WithTimeProvider env m, WithUrlRepository env m, Has HostUrl env) => RequestUrl -> m ShortenedUrl
+shorten :: forall env m. (WithLogger env m, WithError m,  WithUrlRepository env m, Has HostUrl env) => RequestUrl -> m ShortenedUrl
 shorten req | isInvalid req = do
   logError "The submitted url is invalid"
   throwError NotAnUrl
@@ -26,12 +24,12 @@ shorten RequestUrl{..} = go maxTries -- tries `maxTries` times before giving up
       save' <- save <$> grab @(UrlRepository m)
       findById' <- findById <$> grab @(UrlRepository m)
       hostUrl <- hUrl <$> grab @HostUrl
-      timestamp <- grab @(TimeProvider m) >>= getCurrentTimestamp
-      let url@Url{..} = shortenUrl timestamp $ LongUrl raw
+      urlId <- genId 
+      let urlRaw = raw
       maybeAlreadyExists <- findById' urlId
       case maybeAlreadyExists of
         Nothing -> do 
-          _ <- save' url
+          _ <- save' $ Url {..}
           pure $ ShortenedUrl $ hostUrl <> "/" <> urlId 
         Just _ -> go $ n - 1
     counter = T.pack . show . (+ 1) . abs

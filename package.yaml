@@ -20,6 +20,8 @@ dependencies:
   - time
   - http-types
   - autoexporter
+  - cryptohash-md5
+  - uuid
 
 library:
   source-dirs: src

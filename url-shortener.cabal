@@ -15,6 +15,7 @@ library
       Core
       Core.Error
       Core.Has
+      Core.IdGenerator
       Core.Logger
       Core.Repository
       Core.TimeProvider
@@ -65,6 +66,7 @@ library
     , autoexporter
     , base >=4.14 && <5
     , bytestring
+    , cryptohash-md5
     , deriving-aeson
     , either
     , http-types
@@ -76,6 +78,7 @@ library
     , text
     , time
     , unliftio
+    , uuid
     , wai
     , warp
   default-language: Haskell2010
@@ -113,6 +116,7 @@ executable url-shortener
     , autoexporter
     , base >=4.14 && <5
     , bytestring
+    , cryptohash-md5
     , deriving-aeson
     , either
     , http-types
@@ -125,6 +129,7 @@ executable url-shortener
     , time
     , unliftio
     , url-shortener
+    , uuid
     , wai
     , warp
   default-language: Haskell2010
@@ -167,6 +172,7 @@ test-suite spec
     , base >=4.14 && <5
     , bytestring
     , containers
+    , cryptohash-md5
     , deriving-aeson
     , either
     , hedgehog
@@ -187,6 +193,7 @@ test-suite spec
     , unliftio
     , url-shortener
     , utf8-string
+    , uuid
     , wai
     , wai-extra
     , warp
