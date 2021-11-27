@@ -26,13 +26,13 @@ main = do
 -- | Setup everything necessary for 'Env'
 mkAppEnv :: Config -> IO AppEnv 
 mkAppEnv Config{..} = do 
-  pipe <- liftIO $ connect (host cfgMongoHost)
-  _ <- liftIO $ access pipe master "admin" $ auth cfgMongoUser cfgMongoPassword
+  envDB <- liftIO $ connect (host cfgMongoHost)
+  _ <- liftIO $ access envDB master "admin" $ auth cfgMongoUser cfgMongoPassword
   let envPort = cfgPort
   let envTimeProvider = TimeProvider {
     getCurrentTimestamp = liftIO $ round . (* 1000)<$> getPOSIXTime
   }
-  let envUrlRepository = mkUrlRepository pipe
+  let envUrlRepository = mkUrlRepository envDB
   let envHostUrl = HostUrl cfgHostUrl
   envLogger <- consoleLogger  
   pure Env{..}

@@ -7,13 +7,15 @@ module Infra.App.Env (Env (..)) where
 import Control.Monad.Reader (MonadReader)
 import Core (Has (obtain), Logger, TimeProvider, UrlRepository)
 import Handlers (HostUrl)
+import Database.MongoDB (Pipe)
 
 data Env m = Env
   { envPort :: Int,
     envUrlRepository :: UrlRepository m,
     envTimeProvider :: TimeProvider m,
     envHostUrl :: HostUrl,
-    envLogger :: Logger m
+    envLogger :: Logger m,
+    envDB :: Pipe
   }
 
 instance (MonadReader (Env m) m) => Has (UrlRepository m) (Env m) where
