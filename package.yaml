@@ -22,6 +22,7 @@ dependencies:
   - autoexporter
   - cryptohash-md5
   - uuid
+  - resource-pool
 
 library:
   source-dirs: src

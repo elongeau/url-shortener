@@ -1,6 +1,8 @@
-module Infra.Routes (routes,API) where
+module Infra.Routes (routes, API) where
 
-import Handlers (redirect, shorten, RequestUrl, ShortenedUrl, UrlForHeader)
+import qualified Data.Text as T
+import GHC.Generics (Generic)
+import Handlers (RequestUrl, ShortenedUrl, UrlForHeader, redirect, shorten)
 import Infra.App.Monad (App)
 import Servant
   ( Capture,
@@ -15,8 +17,6 @@ import Servant
   )
 import Servant.API.Generic (ToServantApi, type (:-))
 import Servant.Server.Generic (AsServerT)
-import qualified Data.Text as T
-import GHC.Generics (Generic)
 
 type API = ToServantApi UrlRoutes
 

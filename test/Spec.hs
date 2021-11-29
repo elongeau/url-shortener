@@ -1,16 +1,25 @@
 module Main where
 
 import ApiSpec (runApiSpec)
+import Control.Exception (bracket)
 import Core (Logger (Logger))
-import Infra (Env (envLogger), loadConfig)
+import qualified Data.Pool as Pool
+import Infra (AppEnv, Env (envDB, envLogger), loadConfig)
+import Infra.App (Env (Env))
 import Test.Hspec (hspec)
 import UrlShortener (mkAppEnv)
 
 main :: IO ()
-main = do
-  env <- loadConfig >>= mkAppEnv
-  hspec $
-    runApiSpec
-      env
-        { envLogger = Logger \_ _ -> pure ()
-        }
+main =
+  bracket
+    (loadConfig >>= mkAppEnv)
+    (\Env {..} -> Pool.destroyAllResources envDB)
+    runTests
+  where
+    runTests :: AppEnv -> IO ()
+    runTests env =
+      hspec $
+        runApiSpec
+          env
+            { envLogger = Logger \_ _ -> pure ()
+            }

@@ -3,6 +3,8 @@ cabal-version: 1.12
 -- This file has been generated from package.yaml by hpack version 0.34.4.
 --
 -- see: https://github.com/sol/hpack
+--
+-- hash: c6857fd8c956f726cfa4dfbafc223f36f441314962e4f7ac3ca6b4db65302d34
 
 name:           url-shortener
 version:        0.1.0.0
@@ -73,6 +75,7 @@ library
     , mongoDB
     , mr-env
     , mtl
+    , resource-pool
     , servant
     , servant-server
     , text
@@ -123,6 +126,7 @@ executable url-shortener
     , mongoDB
     , mr-env
     , mtl
+    , resource-pool
     , servant
     , servant-server
     , text
@@ -185,6 +189,7 @@ test-suite spec
     , mongoDB
     , mr-env
     , mtl
+    , resource-pool
     , servant
     , servant-client
     , servant-server

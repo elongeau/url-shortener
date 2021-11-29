@@ -2,7 +2,7 @@
 
 module Infra.MongoRepository where
 
-import Core (Repository (Repository, findById, save), UrlRepository, Url(Url))
+import Core (Repository (Repository, findById, save), Url (Url), UrlRepository)
 import qualified Data.Text as T
 import Database.MongoDB (Action, Document, Field ((:=)), Pipe, Val (val), access, findOne, insert, master, select, (!?))
 import Infra.App (App)
