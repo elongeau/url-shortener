@@ -1,4 +1,4 @@
-module UrlShortener (main, runAsApplication, mkAppEnv) where
+module UrlShortener (runIO, runAsApplication, mkAppEnv) where
 
 import Control.Monad.Reader (MonadIO (liftIO))
 import Network.Wai.Handler.Warp (run)
@@ -18,8 +18,8 @@ import Handlers (HostUrl(HostUrl))
 import qualified Data.Pool as Pool
 
 -- | entry point for the application
-main :: IO ()
-main = do
+runIO :: IO ()
+runIO = do
   conf <- loadConfig
   env <- mkAppEnv conf
   runAsIO env

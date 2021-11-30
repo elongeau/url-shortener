@@ -6,5 +6,8 @@ cradle:
     - path: "app/Main.hs"
       component: "url-shortener:exe:url-shortener"
 
+    - path: "app/Paths_url_shortener.hs"
+      component: "url-shortener:exe:url-shortener"
+
     - path: "test"
       component: "url-shortener:test:spec"

@@ -5,5 +5,5 @@ run:
 	@stack --no-nix run
 
 .PHONY: test
-test: 
-	@stack --no-nix test --file-watch
+test: mongo
+	@ghcid --command="stack ghci url-shortener:lib url-shortener:test:spec  --ghci-options=-fobject-code" --test "main"
