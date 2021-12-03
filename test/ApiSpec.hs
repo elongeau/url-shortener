@@ -1,6 +1,7 @@
 module ApiSpec where
 
 import Control.Monad (void)
+import Core (Logger (Logger))
 import Data.Aeson (ToJSON, encode)
 import qualified Data.ByteString as BS
 import Data.ByteString.Lazy.UTF8 (toString)
@@ -9,22 +10,26 @@ import Data.String (IsString (fromString))
 import Database.MongoDB (access, deleteAll, master)
 import Handlers (RequestUrl (RequestUrl))
 import Handlers.Model (ShortenedUrl (ShortenedUrl))
-import Infra (AppEnv, DbPool, Env (envDB, envPort, envLogger), loadConfig)
+import Infra (AppEnv, Env (envDB, envLogger, envPort), loadConfig)
 import Infra.App (Env (Env))
 import Network.HTTP.Types (hContentType, methodPost)
 import Network.Wai (Application)
-import Network.Wai.Handler.Warp (testWithApplication, Port)
+import Network.Wai.Handler.Warp (Port, testWithApplication)
 import Network.Wai.Test (SResponse)
-import Test.Hspec (Spec, SpecWith, describe, it)
+import Test.Hspec (Spec, SpecWith, beforeWith, describe, it)
 import Test.Hspec.Wai (ResponseMatcher (matchHeaders, matchStatus), WaiSession, get, request, shouldRespondWith, withState, (<:>))
 import UrlShortener (mkAppEnv, runAsApplication)
-import Core (Logger(Logger))
 
-withServer :: SpecWith (AppEnv, Application) -> Spec
-withServer = withState runServer
+type TestState = (AppEnv, Application)
+withServer :: SpecWith TestState  -> Spec
+withServer = withState runServer . beforeWith cleanDB
 
-cleanDB :: AppEnv -> IO ()
-cleanDB Env {..} = cleandDB envDB
+cleanDB :: TestState -> IO TestState
+cleanDB x@(Env {..}, _) = do
+  Pool.withResource envDB $ \pipe -> do
+    let run act = access pipe master "url-shortener" act
+    void $ run $ deleteAll "urls" [([], [])]
+  pure x
 
 runServer :: IO (AppEnv, Application)
 runServer = do
@@ -36,8 +41,7 @@ runServer = do
     withNoLogging :: AppEnv -> IO AppEnv
     withNoLogging env = pure $ env {envLogger = Logger \_ _ -> pure ()}
     withPort :: AppEnv -> Port -> IO AppEnv
-    withPort env port =  pure $ env {envPort = port}
-
+    withPort env port = pure $ env {envPort = port}
 
 spec :: Spec
 spec = withServer $ do
@@ -54,14 +58,8 @@ spec = withServer $ do
     it "refuses invalid URL" $ do
       postJson "/shorten" (RequestUrl "not-an-url") `shouldRespondWith` "The submitted url is not a valid url" {matchStatus = 400}
 
-cleandDB :: DbPool -> IO ()
-cleandDB pool =
-  Pool.withResource pool $ \pipe -> do
-    let run act = access pipe master "url-shortener" act
-    void $ run $ deleteAll "urls" [([], [])]
-
 postJson :: (ToJSON a) => BS.ByteString -> a -> WaiSession AppEnv SResponse
-postJson path entity = do 
+postJson path entity = do
   request methodPost path [(hContentType, "application/json")] (encode entity)
 
 toMatcher :: (ToJSON a) => a -> ResponseMatcher
