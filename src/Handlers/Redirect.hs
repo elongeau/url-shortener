@@ -14,11 +14,12 @@ import Servant
 import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
 import Core (WithError, WithUrlRepository, UrlRepository, Url(..), grab, Repository (findById), throwError, AppErrorType (NotFound), WithLogger, logInfo, logError)
+import Core.Urls (RawUrl(RawUrl))
 
 -- | Allow to add the long URL as Header
 newtype UrlForHeader = UrlForHeader Url 
 instance ToHttpApiData UrlForHeader  where
-  toHeader (UrlForHeader (Url raw _)) = T.encodeUtf8 raw
+  toHeader (UrlForHeader (Url (RawUrl raw) _)) = T.encodeUtf8 raw
   toUrlPiece = undefined -- not used
 
 -- | Handler to redirect to an existing URL

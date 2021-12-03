@@ -6,6 +6,7 @@ module Handlers.Shorten ( shorten) where
 import Handlers.Model (RequestUrl (RequestUrl, raw), ShortenedUrl (ShortenedUrl), HostUrl(..))
 import qualified Data.Text as T
 import Core (WithError, WithUrlRepository, Has, UrlRepository, Url(..), grab, Repository (findById, save), throwError, AppErrorType (ConcurrentAccess, NotAnUrl), WithLogger, logInfo, logError, genId)
+import Core.Urls (RawUrl(RawUrl))
 
 -- | Handler to shorten an URL
 shorten :: forall env m. (WithLogger env m, WithError m,  WithUrlRepository env m, Has HostUrl env) => RequestUrl -> m ShortenedUrl
@@ -25,7 +26,7 @@ shorten RequestUrl{..} = go maxTries -- tries `maxTries` times before giving up
       findById' <- findById <$> grab @(UrlRepository m)
       hostUrl <- hUrl <$> grab @HostUrl
       urlId <- genId 
-      let urlRaw = raw
+      let urlRaw = RawUrl raw
       maybeAlreadyExists <- findById' urlId
       case maybeAlreadyExists of
         Nothing -> do 

@@ -1,6 +1,6 @@
 module Core.Urls.ServiceSpec where
 
-import Core (LongUrl (..), Url (urlId, urlRaw), shortenUrl)
+import Core (LongUrl (..), RawUrl (RawUrl, unRaw), Url (urlId, urlRaw), shortenUrl)
 import Data.Char (isAlphaNum)
 import qualified Data.Text as T
 import qualified Hedgehog.Gen as Gen
@@ -17,8 +17,8 @@ spec = describe "encoding an URL" $ do
       f x === 7
   it "return the original URL" $
     hedgehog $ do
-      url <- forAll $ Gen.text (Range.linear 20 50) Gen.alpha
-      let result = urlRaw $ shortenUrl 0 (LongUrl url)
+      url <- forAll $ RawUrl <$> Gen.text (Range.linear 20 50) Gen.alpha
+      let result = urlRaw $ shortenUrl 0 (LongUrl $ unRaw url)
       result === url
   it "use only characters from base62" $
     hedgehog $ do
