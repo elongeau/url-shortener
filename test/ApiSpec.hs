@@ -25,11 +25,11 @@ withServer :: SpecWith TestState  -> Spec
 withServer = withState runServer . beforeWith cleanDB
 
 cleanDB :: TestState -> IO TestState
-cleanDB x@(Env {..}, _) = do
+cleanDB state@(Env {..}, _) = do
   Pool.withResource envDB $ \pipe -> do
     let run act = access pipe master "url-shortener" act
     void $ run $ deleteAll "urls" [([], [])]
-  pure x
+  pure state
 
 runServer :: IO (AppEnv, Application)
 runServer = do
@@ -46,10 +46,9 @@ runServer = do
 spec :: Spec
 spec = withServer $ do
   describe "Using the API" $ do
-    it "creates a short URL and then redirect to original url" $
-      do
-        _ <- postJson "/shorten" (RequestUrl "http://example.com") `shouldRespondWith` (toMatcher (ShortenedUrl "http://localhost:8080/foo")) {matchStatus = 201}
-        get "/foo" `shouldRespondWith` 301 {matchHeaders = ["Location" <:> "http://example.com"]}
+    it "creates a short URL and then redirect to original url" $ do
+      _ <- postJson "/shorten" (RequestUrl "http://example.com") `shouldRespondWith` (toMatcher (ShortenedUrl "http://localhost:8080/foo")) {matchStatus = 201}
+      get "/foo" `shouldRespondWith` 301 {matchHeaders = ["Location" <:> "http://example.com"]}
     it "responds Not-Found when short url is unknown" $ do
       get "/unknown" `shouldRespondWith` 404
     it "fails on existing ID" $ do
