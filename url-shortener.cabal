@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 149728e287f697c4f78480abd9114c38d199f2beea8ac0e80a5d0eaaf2a1e20c
+-- hash: 3ea07cc6fa797a5fbb9d09a65645ca2eb705ec1c4861df6128f0d6a78b0bbb3a
 
 name:           url-shortener
 version:        0.1.0.0
@@ -22,9 +22,9 @@ library
       Core.Repository
       Core.TimeProvider
       Core.Urls
-      Core.Urls.Model
+      Core.Urls.Data
       Handlers
-      Handlers.Model
+      Handlers.Data
       Handlers.Redirect
       Handlers.Shorten
       Infra

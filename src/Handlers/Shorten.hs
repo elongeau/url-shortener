@@ -3,7 +3,7 @@
 
 module Handlers.Shorten ( shorten) where
 
-import Handlers.Model (RequestUrl (RequestUrl, raw), ShortenedUrl (ShortenedUrl), HostUrl(..))
+import Handlers.Data (RequestUrl (RequestUrl, raw), ShortenedUrl (ShortenedUrl), HostUrl(..))
 import qualified Data.Text as T
 import Core (WithError, WithUrlRepository, Has, UrlRepository, Url(..), grab, Repository (findById, save), throwError, AppErrorType (ConcurrentAccess, NotAnUrl), WithLogger, logInfo, logError, genId, unShort)
 import Core.Urls (RawUrl(RawUrl))

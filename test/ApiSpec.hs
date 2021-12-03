@@ -9,7 +9,7 @@ import qualified Data.Pool as Pool
 import Data.String (IsString (fromString))
 import Database.MongoDB (access, deleteAll, master)
 import Handlers (RequestUrl (RequestUrl))
-import Handlers.Model (ShortenedUrl (ShortenedUrl))
+import Handlers.Data (ShortenedUrl (ShortenedUrl))
 import Infra (AppEnv, Env (envDB, envLogger, envPort), loadConfig)
 import Infra.App (Env (Env))
 import Network.HTTP.Types (hContentType, methodPost)
