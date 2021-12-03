@@ -1,6 +1,6 @@
 module Core.IdGenerator where
 
-import qualified Data.Text as T
+import Core.Urls (ShortUrl (ShortUrl))
 
-genId :: (Monad m) => m T.Text
-genId = pure "foo"
+genId :: (Monad m) => m ShortUrl
+genId = pure $ ShortUrl "foo"

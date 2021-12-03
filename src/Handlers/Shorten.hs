@@ -5,7 +5,7 @@ module Handlers.Shorten ( shorten) where
 
 import Handlers.Model (RequestUrl (RequestUrl, raw), ShortenedUrl (ShortenedUrl), HostUrl(..))
 import qualified Data.Text as T
-import Core (WithError, WithUrlRepository, Has, UrlRepository, Url(..), grab, Repository (findById, save), throwError, AppErrorType (ConcurrentAccess, NotAnUrl), WithLogger, logInfo, logError, genId)
+import Core (WithError, WithUrlRepository, Has, UrlRepository, Url(..), grab, Repository (findById, save), throwError, AppErrorType (ConcurrentAccess, NotAnUrl), WithLogger, logInfo, logError, genId, unShort)
 import Core.Urls (RawUrl(RawUrl))
 
 -- | Handler to shorten an URL
@@ -14,7 +14,7 @@ shorten req | isInvalid req = do
   logError "The submitted url is invalid"
   throwError NotAnUrl
 shorten RequestUrl{..} = go maxTries -- tries `maxTries` times before giving up
-  where 
+  where
     maxTries = 3
     go :: Int -> m ShortenedUrl
     go x | x < 1 = do
@@ -25,15 +25,15 @@ shorten RequestUrl{..} = go maxTries -- tries `maxTries` times before giving up
       save' <- save <$> grab @(UrlRepository m)
       findById' <- findById <$> grab @(UrlRepository m)
       hostUrl <- hUrl <$> grab @HostUrl
-      urlId <- genId 
+      urlId <- genId
       let urlRaw = RawUrl raw
       maybeAlreadyExists <- findById' urlId
       case maybeAlreadyExists of
-        Nothing -> do 
+        Nothing -> do
           _ <- save' $ Url {..}
-          pure $ ShortenedUrl $ hostUrl <> "/" <> urlId 
+          pure $ ShortenedUrl $ hostUrl <> "/" <> unShort urlId
         Just _ -> go $ n - 1
     counter = T.pack . show . (+ 1) . abs
 
-isInvalid :: RequestUrl -> Bool 
+isInvalid :: RequestUrl -> Bool
 isInvalid RequestUrl{..} = not $ T.isPrefixOf "http" raw

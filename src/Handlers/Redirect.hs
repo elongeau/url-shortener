@@ -11,10 +11,8 @@ import Servant
       NoContent(..),
       Header,
       Headers)
-import qualified Data.Text as T
 import qualified Data.Text.Encoding as T
-import Core (WithError, WithUrlRepository, UrlRepository, Url(..), grab, Repository (findById), throwError, AppErrorType (NotFound), WithLogger, logInfo, logError)
-import Core.Urls (RawUrl(RawUrl))
+import Core (WithError,RawUrl(RawUrl), WithUrlRepository, UrlRepository, Url(..), grab, Repository (findById), throwError, AppErrorType (NotFound), WithLogger, logInfo, logError, ShortUrl(ShortUrl))
 
 -- | Allow to add the long URL as Header
 newtype UrlForHeader = UrlForHeader Url 
@@ -23,10 +21,10 @@ instance ToHttpApiData UrlForHeader  where
   toUrlPiece = undefined -- not used
 
 -- | Handler to redirect to an existing URL
-redirect :: forall env m. (WithLogger env m, WithError m, WithUrlRepository env m) => T.Text -> m (Headers '[Header "Location" UrlForHeader] NoContent)
-redirect urlId = do
+redirect :: forall env m. (WithLogger env m, WithError m, WithUrlRepository env m) => ShortUrl -> m (Headers '[Header "Location" UrlForHeader] NoContent)
+redirect shortUrl@(ShortUrl urlId) = do
   repo <- grab @(UrlRepository m)
-  maybeUrl <- findById repo urlId
+  maybeUrl <- findById repo shortUrl
   case maybeUrl of
     Nothing -> do
       logError $ "no url for ID: " <> urlId
