@@ -9,20 +9,14 @@ newtype RequestUrl = RequestUrl
   { raw :: T.Text
   }
   deriving stock (Show, Eq, Generic)
-
-instance FromJSON RequestUrl
-
-instance ToJSON RequestUrl
+  deriving newtype (FromJSON, ToJSON)
 
 -- | The shortened URL
 newtype ShortenedUrl = ShortenedUrl
   { url :: T.Text
   }
   deriving stock (Show, Eq, Generic)
-
-instance FromJSON ShortenedUrl
-
-instance ToJSON ShortenedUrl
+  deriving newtype (FromJSON, ToJSON)
 
 -- | the Host URL
 newtype HostUrl = HostUrl
