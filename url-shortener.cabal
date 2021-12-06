@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 3ea07cc6fa797a5fbb9d09a65645ca2eb705ec1c4861df6128f0d6a78b0bbb3a
+-- hash: 6309365705a80bd2e541b35976ef92f353f7abf057d746120fce002215ce35ac
 
 name:           url-shortener
 version:        0.1.0.0
@@ -145,6 +145,7 @@ test-suite spec
   other-modules:
       ApiSpec
       Infra.ConfigSpec
+      TestUtils
       Paths_url_shortener
   hs-source-dirs:
       test
