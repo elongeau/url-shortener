@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 6309365705a80bd2e541b35976ef92f353f7abf057d746120fce002215ce35ac
+-- hash: 4e7a8ce1990aa8945f39dac84a1400773aa3fe9986256c92749905d446df0100
 
 name:           url-shortener
 version:        0.1.0.0

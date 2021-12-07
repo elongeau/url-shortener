@@ -6,4 +6,4 @@ run:
 
 .PHONY: test
 test: mongo
-	@ghcid --command="stack ghci url-shortener:lib url-shortener:test:spec  --ghci-options=-fobject-code" --test "main"
+	@ghcid --command="stack --no-nix ghci url-shortener:lib url-shortener:test:spec  --ghci-options=-fobject-code" --test "main"
