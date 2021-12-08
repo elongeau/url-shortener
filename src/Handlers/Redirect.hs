@@ -10,15 +10,20 @@ import Servant
       ToHttpApiData(..),
       NoContent(..),
       Header,
-      Headers)
+      Headers, FromHttpApiData)
 import qualified Data.Text.Encoding as T
 import Core (WithError,RawUrl(RawUrl), WithUrlRepository, UrlRepository, Url(..), grab, Repository (findById), throwError, AppErrorType (NotFound), WithLogger, logInfo, logError, ShortUrl(ShortUrl))
+import Servant.API (FromHttpApiData(parseUrlPiece))
+import qualified Data.Text as T
 
 -- | Allow to add the long URL as Header
-newtype UrlForHeader = UrlForHeader Url 
+newtype UrlForHeader = UrlForHeader T.Text 
 instance ToHttpApiData UrlForHeader  where
-  toHeader (UrlForHeader (Url (RawUrl raw) _)) = T.encodeUtf8 raw
+  toHeader (UrlForHeader raw) = T.encodeUtf8 raw
   toUrlPiece = undefined -- not used
+
+instance FromHttpApiData UrlForHeader where
+  parseUrlPiece = Right . UrlForHeader
 
 -- | Handler to redirect to an existing URL
 redirect :: forall env m. (WithLogger env m, WithError m, WithUrlRepository env m) => ShortUrl -> m (Headers '[Header "Location" UrlForHeader] NoContent)
@@ -29,6 +34,6 @@ redirect shortUrl@(ShortUrl urlId) = do
     Nothing -> do
       logError $ "no url for ID: " <> urlId
       throwError NotFound 
-    Just url -> do
+    Just (Url (RawUrl raw) _ ) -> do
       logInfo $ "found a url for ID: " <> urlId
-      return (addHeader (UrlForHeader url) NoContent)
+      return (addHeader (UrlForHeader raw) NoContent)

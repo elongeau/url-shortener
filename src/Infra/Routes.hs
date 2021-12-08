@@ -1,4 +1,4 @@
-module Infra.Routes (routes, API) where
+module Infra.Routes (routes, API, UrlRoutes(..)) where
 
 import Core (ShortUrl)
 import GHC.Generics (Generic)
@@ -28,8 +28,8 @@ type Redirect loc = Verb 'GET 301 '[JSON] (Headers '[Header "Location" loc] NoCo
 
 -- | Define the routes of the application
 data UrlRoutes route = UrlRoutes
-  { _shorten :: route :- "shorten" :> ReqBody '[JSON] RequestUrl :> Created '[JSON] ShortenedUrl,
-    _redirect :: route :- Capture "id" ShortUrl :> Redirect UrlForHeader
+  { postShorten :: route :- "shorten" :> ReqBody '[JSON] RequestUrl :> Created '[JSON] ShortenedUrl,
+    routeRedirect :: route :- Capture "id" ShortUrl :> Redirect UrlForHeader
   }
   deriving stock (Generic)
 
@@ -39,6 +39,6 @@ type AppServer = AsServerT App
 routes :: UrlRoutes AppServer
 routes =
   UrlRoutes
-    { _shorten = shorten,
-      _redirect = redirect
+    { postShorten = shorten,
+      routeRedirect = redirect
     }

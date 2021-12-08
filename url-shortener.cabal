@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: 4e7a8ce1990aa8945f39dac84a1400773aa3fe9986256c92749905d446df0100
+-- hash: fcc3cc38763969f056ab080a2bf9e8ffd3dffda9649a6c68917886e26009b2ff
 
 name:           url-shortener
 version:        0.1.0.0
@@ -77,6 +77,8 @@ library
     , mtl
     , resource-pool
     , servant
+    , servant-client
+    , servant-client-core
     , servant-server
     , text
     , time
@@ -129,6 +131,8 @@ executable url-shortener
     , mtl
     , resource-pool
     , servant
+    , servant-client
+    , servant-client-core
     , servant-server
     , text
     , time
@@ -146,6 +150,7 @@ test-suite spec
       ApiSpec
       Infra.ConfigSpec
       TestUtils
+      UrlShortenerSpec
       Paths_url_shortener
   hs-source-dirs:
       test
@@ -194,6 +199,7 @@ test-suite spec
     , resource-pool
     , servant
     , servant-client
+    , servant-client-core
     , servant-server
     , text
     , time

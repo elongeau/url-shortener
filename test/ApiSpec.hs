@@ -4,8 +4,9 @@ import Handlers (RequestUrl (RequestUrl))
 import Handlers.Data (ShortenedUrl (ShortenedUrl))
 import Test.Hspec (Spec, describe, it)
 import Test.Hspec.Wai (ResponseMatcher (matchHeaders, matchStatus), get, shouldRespondWith, (<:>))
-import TestUtils (withServer, postJson, toMatcher)
+import TestUtils (postJson, toMatcher, withServer)
 
+-- | These tests are lilke golden-test for the API: they assert that the API respond to expect HTTP methods
 spec :: Spec
 spec = withServer $ do
   describe "Using the API" $ do

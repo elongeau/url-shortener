@@ -23,6 +23,8 @@ dependencies:
   - cryptohash-md5
   - uuid
   - resource-pool
+  - servant-client
+  - servant-client-core
 
 library:
   source-dirs: src
