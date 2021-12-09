@@ -19,7 +19,9 @@ import Database.MongoDB (access, master, deleteAll)
 import Control.Monad (void)
 import UrlShortener (mkAppEnv, runAsApplication)
 import Core (Logger(Logger))
+
 type TestState = (AppEnv, Application)
+
 withServer :: SpecWith TestState  -> Spec
 withServer = withState runServer . beforeWith cleanDB
 
