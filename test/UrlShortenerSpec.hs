@@ -9,7 +9,7 @@ import Infra (AppEnv, Env (Env, envDB, envLogger), UrlRoutes (..), loadConfig)
 import Network.HTTP.Client (defaultManagerSettings, newManager)
 import Network.Wai (Application)
 import qualified Network.Wai.Handler.Warp as Warp
-import Servant.Client (BaseUrl (baseUrlPort), ClientEnv, ClientM, mkClientEnv, parseBaseUrl, runClientM)
+import Servant.Client (BaseUrl (baseUrlPort), ClientEnv, ClientM, mkClientEnv, parseBaseUrl, runClientM, ClientError)
 import Servant.Client.Generic (AsClientT, genericClient)
 import Test.Hspec (Spec, SpecWith, aroundAllWith, beforeAll, beforeAllWith, beforeWith, describe, it, shouldBe)
 import UrlShortener (mkAppEnv, runAsApplication)
@@ -43,12 +43,12 @@ withClientEnv useClientEnv app = do
 withServer :: SpecWith ClientEnv -> Spec
 withServer = beforeAll mkEnv . beforeWith cleanDB . beforeAllWith mkApp . aroundAllWith withClientEnv
 
+runTest :: ClientEnv -> (UrlRoutes (AsClientT ClientM) -> ClientM a) ->  IO (Either ClientError a)
+runTest cenv func = runClientM (func mainClient) cenv
+
 spec :: Spec
 spec = withServer do
   describe "shortening" $ do
     it "shorten any valid url" $ \cenv -> do
-      result <- runClientM (postShorten mainClient (RequestUrl "http://example.com")) cenv
-      result `shouldBe` Right (ShortenedUrl "http://localhost:8080/foo")
-    it "another test" $ \cenv -> do
-      result <- runClientM (postShorten mainClient (RequestUrl "http://example.com")) cenv
+      result <- runTest cenv (`postShorten` RequestUrl "http://example.com")
       result `shouldBe` Right (ShortenedUrl "http://localhost:8080/foo")
