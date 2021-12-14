@@ -1,17 +1,18 @@
 module UrlShortenerSpec where
 
 import Control.Monad (void)
-import Core (Logger (Logger))
+import Core (ShortUrl (ShortUrl), Logger (Logger))
 import qualified Data.Pool as Pool
 import Database.MongoDB (access, deleteAll, master)
 import Handlers (RequestUrl (RequestUrl), ShortenedUrl (ShortenedUrl))
 import Infra (AppEnv, Env (Env, envDB, envLogger), UrlRoutes (..), loadConfig)
-import Network.HTTP.Client (defaultManagerSettings, newManager)
+import Network.HTTP.Client (ManagerSettings (managerModifyRequest), Request (requestHeaders), defaultManagerSettings, newManager)
 import Network.Wai (Application)
 import qualified Network.Wai.Handler.Warp as Warp
-import Servant.Client (BaseUrl (baseUrlPort), ClientEnv, ClientM, mkClientEnv, parseBaseUrl, runClientM, ClientError)
+import Servant (GetHeaders (getHeaders))
+import Servant.Client (BaseUrl (baseUrlPort), ClientEnv, ClientError, ClientM, mkClientEnv, parseBaseUrl, runClientM)
 import Servant.Client.Generic (AsClientT, genericClient)
-import Test.Hspec (Spec, SpecWith, aroundAllWith, beforeAll, beforeAllWith, beforeWith, describe, it, shouldBe)
+import Test.Hspec (Spec, SpecWith, aroundAllWith, beforeAll, beforeAllWith, beforeWith, describe, expectationFailure, it, shouldBe)
 import UrlShortener (mkAppEnv, runAsApplication)
 
 mainClient :: UrlRoutes (AsClientT ClientM)
@@ -26,7 +27,7 @@ mkEnv = loadConfig >>= mkAppEnv >>= withNoLogging
 cleanDB :: AppEnv -> IO AppEnv
 cleanDB env@Env {..} = do
   Pool.withResource envDB $ \pipe -> do
-    let run act = access pipe master "url-shortener" act
+    let run = access pipe master "url-shortener"
     void $ run $ deleteAll "urls" [([], [])]
   pure env
 
@@ -36,14 +37,20 @@ mkApp = pure . runAsApplication
 withClientEnv :: (ClientEnv -> IO ()) -> Application -> IO ()
 withClientEnv useClientEnv app = do
   baseUrl <- parseBaseUrl "http://localhost"
-  manager <- newManager defaultManagerSettings
+  manager <- newManager $ defaultManagerSettings {managerModifyRequest = fixAccept}
   let clientEnv port = mkClientEnv manager (baseUrl {baseUrlPort = port})
   Warp.testWithApplication (pure app) $ useClientEnv . clientEnv
+  where
+    fixAccept req =
+      return $
+        req
+          { requestHeaders = filter (("Location" /=) . fst) (requestHeaders req)
+          }
 
 withServer :: SpecWith ClientEnv -> Spec
 withServer = beforeAll mkEnv . beforeWith cleanDB . beforeAllWith mkApp . aroundAllWith withClientEnv
 
-runTest :: ClientEnv -> (UrlRoutes (AsClientT ClientM) -> ClientM a) ->  IO (Either ClientError a)
+runTest :: ClientEnv -> (UrlRoutes (AsClientT ClientM) -> ClientM a) -> IO (Either ClientError a)
 runTest cenv func = runClientM (func mainClient) cenv
 
 spec :: Spec
@@ -52,3 +59,9 @@ spec = withServer do
     it "shorten any valid url" $ \cenv -> do
       result <- runTest cenv (`postShorten` RequestUrl "http://example.com")
       result `shouldBe` Right (ShortenedUrl "http://localhost:8080/foo")
+      res <- runTest cenv (`getRedirect` ShortUrl "foo")
+      case res of
+        Left err -> expectationFailure $ show err
+        Right headers ->
+          let h = getHeaders headers
+           in h `shouldBe` [("Location", "http://example.com")]

@@ -20,7 +20,7 @@ instance FromHttpApiData ShortUrl where
 
 instance ToHttpApiData ShortUrl  where
   toHeader (ShortUrl url) = T.encodeUtf8 url
-  toUrlPiece = undefined -- not used
+  toUrlPiece (ShortUrl url) = url
 
 -- | Represents the long URL with its ID
 data Url = Url

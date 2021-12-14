@@ -29,7 +29,7 @@ type Redirect loc = Verb 'GET 301 '[JSON] (Headers '[Header "Location" loc] NoCo
 -- | Define the routes of the application
 data UrlRoutes route = UrlRoutes
   { postShorten :: route :- "shorten" :> ReqBody '[JSON] RequestUrl :> Created '[JSON] ShortenedUrl,
-    routeRedirect :: route :- Capture "id" ShortUrl :> Redirect UrlForHeader
+    getRedirect :: route :- Capture "id" ShortUrl :> Redirect UrlForHeader
   }
   deriving stock (Generic)
 
@@ -40,5 +40,5 @@ routes :: UrlRoutes AppServer
 routes =
   UrlRoutes
     { postShorten = shorten,
-      routeRedirect = redirect
+      getRedirect = redirect
     }

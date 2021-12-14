@@ -35,5 +35,5 @@ redirect shortUrl@(ShortUrl urlId) = do
       logError $ "no url for ID: " <> urlId
       throwError NotFound 
     Just (Url (RawUrl raw) _ ) -> do
-      logInfo $ "found a url for ID: " <> urlId
+      logInfo $ "found an url for ID: " <> urlId
       return (addHeader (UrlForHeader raw) NoContent)
