@@ -29,7 +29,7 @@ mkAppEnv Config{..} = do
     let envTimeProvider = TimeProvider {
       getCurrentTimestamp = liftIO $ round . (* 1000)<$> getPOSIXTime
     }
-    envUrlRepository <- liftIO $ Pool.withResource envDB  $ pure . mkUrlRepository
+    envUrlRepository <- liftIO $ pure $ mkUrlRepository envDB
     let envHostUrl = HostUrl cfgHostUrl
     envLogger <- consoleLogger
     pure Env{..}

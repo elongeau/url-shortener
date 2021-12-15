@@ -2,14 +2,13 @@
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE UndecidableInstances #-}
 
-module Infra.App.Env (Env (..), withPool, DbPool) where
+module Infra.App.Env (Env (..), DbPool) where
 
-import Control.Monad.Reader (MonadReader,MonadIO, liftIO)
-import Core (Has (obtain), Logger, TimeProvider, UrlRepository,grab)
-import Handlers (HostUrl)
-import Database.MongoDB (Pipe)
-import qualified Data.Pool as Pool
+import Control.Monad.Reader (MonadReader)
+import Core (Has (obtain), Logger, TimeProvider, UrlRepository)
 import Data.Pool (Pool)
+import Database.MongoDB (Pipe)
+import Handlers (HostUrl)
 
 type DbPool = Pool Pipe
 
@@ -33,10 +32,3 @@ instance (MonadReader (Env m) m) => Has HostUrl (Env m) where
 
 instance (MonadReader (Env m) m) => Has (Logger m) (Env m) where
   obtain = envLogger
-
-type WithDb env m = (MonadReader env m, Has DbPool env, MonadIO m)
-
-withPool :: WithDb env m => (Pipe -> IO b) -> m b
-withPool f = do
-    pool <- grab @DbPool
-    liftIO $ Pool.withResource pool f
